@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Zap, MessageSquare, Globe } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -21,17 +21,19 @@ const HeroSection = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
+              asChild
               size="lg" 
-              className="bg-[#FFD700] hover:bg-[#FFE44D] text-black text-lg px-8"
+              className="bg-[#FFD700] hover:bg-[#FFE44D] text-black text-lg px-8 border-2 border-[#FFD700]"
             >
-              Request Demo
+              <Link to="/contact">Request Demo</Link>
             </Button>
             <Button 
+              asChild
               variant="outline" 
               size="lg"
-              className="border-white text-white hover:bg-white hover:text-black text-lg px-8"
+              className="border-2 border-white text-white hover:bg-white hover:text-black text-lg px-8"
             >
-              Get Started
+              <Link to="/services">Get Started</Link>
             </Button>
           </div>
         </div>

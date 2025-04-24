@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
+import { services } from "@/lib/services";
 
 const footerLinks = [
   {
@@ -13,17 +14,7 @@ const footerLinks = [
       { name: "Privacy Policy", href: "/privacy" },
       { name: "Terms of Service", href: "/terms" },
     ],
-  },
-  {
-    title: "Services",
-    links: [
-      { name: "Smart Agents", href: "/services/smart-agents" },
-      { name: "AI Consulting", href: "/services/ai-consulting" },
-      { name: "Conversational AI", href: "/services/conversational-ai" },
-      { name: "Brand Management", href: "/services/brand-management" },
-      { name: "Web Development", href: "/services/web-development" },
-    ],
-  },
+  }
 ];
 
 const socialLinks = [
@@ -66,6 +57,22 @@ export default function Footer() {
               </ul>
             </div>
           ))}
+
+          <div>
+            <h2 className="font-bold text-lg mb-4">Services</h2>
+            <ul className="space-y-2">
+              {services.map((service) => (
+                <li key={service.slug}>
+                  <Link
+                    to={`/services/${service.slug}`}
+                    className="text-gray-400 hover:text-white transition-colors text-sm"
+                  >
+                    {service.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           <div>
             <h2 className="font-bold text-lg mb-4">Newsletter</h2>
