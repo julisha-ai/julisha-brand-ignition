@@ -1,4 +1,3 @@
-
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -85,33 +84,30 @@ export default function Header() {
             <Link to="/contact">Request Demo</Link>
           </Button>
 
-          <div className="md:hidden flex items-center">
-            <Button
-              variant="outline"
-              size="icon"
-              className="border-white text-white hover:bg-white/20"
-              aria-label="Toggle menu"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+          <Button
+            variant="outline"
+            size="icon"
+            className="border-[#FFD700] text-[#FFD700] hover:bg-[#FFD700] hover:text-black md:hidden"
+            aria-label="Toggle menu"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                />
-              </svg>
-            </Button>
-          </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
+            </svg>
+          </Button>
         </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-gray-800 pt-4">
             <nav className="flex flex-col space-y-4">

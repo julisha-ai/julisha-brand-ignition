@@ -1,7 +1,6 @@
-
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
 import { Link } from "react-router-dom";
 import { services } from "@/lib/services";
 
@@ -29,11 +28,11 @@ export default function Footer() {
     <footer role="contentinfo" className="bg-black text-white">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="md:col-span-1">
+          <div className="md:col-span-1 text-center md:text-left">
             <img
               src="/lovable-uploads/8879aed8-bd16-443b-9953-a535627f1ff3.png"
               alt="Julisha Solutions"
-              className="h-12 mb-4"
+              className="h-12 mb-4 mx-auto md:mx-0"
             />
             <p className="text-gray-400 text-sm">
               Unifying AI innovation with strategic brand management for seamless digital presence
@@ -87,7 +86,13 @@ export default function Footer() {
               </Button>
             </div>
             <div className="flex gap-4 mt-6">
-              {socialLinks.map(({ Icon, href }) => (
+              {[
+                { Icon: Facebook, href: "https://www.facebook.com/profile.php?id=61560274963428" },
+                { Icon: Instagram, href: "https://www.instagram.com/julisha.ai/" },
+                { Icon: Twitter, href: "https://x.com/JulishaSol" },
+                { Icon: Linkedin, href: "https://www.linkedin.com/in/julisha-solutions/" },
+                { Icon: Youtube, href: "https://www.youtube.com/@JulishaAi" }
+              ].map(({ Icon, href }) => (
                 <a
                   key={href}
                   href={href}

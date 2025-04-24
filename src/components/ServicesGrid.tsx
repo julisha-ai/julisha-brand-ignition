@@ -1,34 +1,7 @@
 
+import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { Zap, MessageSquare, Globe, Lightbulb, Code } from "lucide-react";
-
-const services = [
-  {
-    icon: Zap,
-    title: "Smart Agents",
-    description: "AI-powered solutions that streamline your business operations"
-  },
-  {
-    icon: MessageSquare,
-    title: "Conversational AI",
-    description: "Intelligent chatbots and virtual assistants for enhanced customer engagement"
-  },
-  {
-    icon: Globe,
-    title: "Brand Management",
-    description: "Comprehensive brand strategy and digital presence optimization"
-  },
-  {
-    icon: Lightbulb,
-    title: "AI Consulting",
-    description: "Expert guidance on implementing AI solutions for your business"
-  },
-  {
-    icon: Code,
-    title: "Web Development",
-    description: "Custom web solutions built with cutting-edge technology"
-  }
-];
+import { services } from "@/lib/services";
 
 const ServicesGrid = () => {
   return (
@@ -38,12 +11,14 @@ const ServicesGrid = () => {
           Our Services
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => (
-            <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
-              <service.icon className="w-12 h-12 mb-4 text-[#FFD700]" />
-              <h3 className="text-xl font-bold mb-2">{service.title}</h3>
-              <p className="text-gray-600">{service.description}</p>
-            </Card>
+          {services.map((service) => (
+            <Link key={service.slug} to={`/services/${service.slug}`} className="block hover:scale-105 transition-transform">
+              <Card className="p-6 hover:shadow-lg transition-shadow h-full">
+                <service.icon className="w-12 h-12 mb-4 text-[#FFD700]" />
+                <h3 className="text-xl font-bold mb-2">{service.title}</h3>
+                <p className="text-gray-600">{service.description}</p>
+              </Card>
+            </Link>
           ))}
         </div>
       </div>
