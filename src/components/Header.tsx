@@ -32,7 +32,7 @@ export default function Header() {
             />
           </Link>
           
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-8 items-center">
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -46,10 +46,10 @@ export default function Header() {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-white hover:text-[#FFD700] transition-colors text-sm lg:text-base bg-transparent hover:bg-transparent focus:bg-transparent">
+                  <NavigationMenuTrigger className="text-white hover:text-[#FFD700] transition-colors text-sm lg:text-base bg-transparent hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
                     Our Services
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className="bg-black border border-gray-800">
+                  <NavigationMenuContent className="bg-black border border-gray-800 z-50 mt-2">
                     <ul className="grid w-[400px] gap-3 p-4">
                       {services.map((service) => (
                         <li key={service.slug}>
