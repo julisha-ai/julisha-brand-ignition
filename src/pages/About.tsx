@@ -7,7 +7,7 @@ const About = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative py-24 bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-primary-foreground overflow-hidden">
+      <section className="relative py-24 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div 
             className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"

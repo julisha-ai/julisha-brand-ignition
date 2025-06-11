@@ -18,7 +18,7 @@ const HeroSection = () => {
       <div className="container mx-auto px-4 py-16 relative z-20">
         <div className="max-w-3xl mx-auto text-center">
           <img 
-            src="/lovable-uploads/8879aed8-bd16-443b-9953-a535627f1ff3.png"
+            src="https://res.cloudinary.com/dx6zxdlts/image/upload/v1749648708/julisha-solutions-logo-2_syjxlj.png"
             alt="Julisha Solutions"
             className="h-20 mx-auto mb-8"
           />
