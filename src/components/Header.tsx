@@ -25,7 +25,7 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center">
             <img
-              src="/lovable-uploads/8879aed8-bd16-443b-9953-a535627f1ff3.png"
+              src="https://res.cloudinary.com/dx6zxdlts/image/upload/v1749648708/julisha-solutions-logo-2_syjxlj.png"
               alt="Julisha Solutions"
               className="h-12 md:h-14"
             />
