@@ -45,28 +45,31 @@ export default function Header() {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-white hover:text-[#FFD700] transition-colors text-sm lg:text-base bg-transparent hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
+                  <NavigationMenuTrigger className="text-white hover:text-[#FFD700] transition-colors text-sm lg:text-base bg-transparent hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent data-[state=open]:text-[#FFD700]">
                     Our Services
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className="bg-black border border-gray-800 z-50 mt-2">
-                    <ul className="grid w-[400px] gap-3 p-4">
+                  <NavigationMenuContent className="!bg-black !border !border-gray-700 !shadow-xl min-w-[400px] !z-[100]">
+                    <ul className="grid w-[400px] gap-1 p-4 text-white">
                       {services.map((service) => (
                         <li key={service.slug}>
                           <Link
                             to={`/services/${service.slug}`}
-                            className="flex items-center gap-2 p-2 hover:bg-gray-800 rounded-md"
+                            className="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-md transition-colors text-white hover:text-[#FFD700] group"
                           >
-                            <service.icon className="w-6 h-6 text-[#FFD700]" />
-                            <span>{service.title}</span>
+                            <service.icon className="w-5 h-5 text-[#FFD700] group-hover:scale-110 transition-transform" />
+                            <div className="flex flex-col">
+                              <span className="font-medium">{service.title}</span>
+                              <span className="text-xs text-gray-400 group-hover:text-gray-300">{service.description}</span>
+                            </div>
                           </Link>
                         </li>
                       ))}
-                      <li>
+                      <li className="border-t border-gray-700 pt-2 mt-2">
                         <Link
                           to="/services"
-                          className="flex items-center gap-2 p-2 hover:bg-gray-800 rounded-md mt-2 border-t border-gray-700 pt-4"
+                          className="flex items-center justify-center gap-2 p-3 hover:bg-gray-800 rounded-md transition-colors text-[#FFD700] hover:text-[#FFE44D] font-medium"
                         >
-                          <span>View All Services</span>
+                          <span>View All Services →</span>
                         </Link>
                       </li>
                     </ul>
