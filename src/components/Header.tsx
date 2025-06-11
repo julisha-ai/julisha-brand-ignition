@@ -42,13 +42,13 @@ export default function Header() {
               </Link>
             ))}
 
-            <NavigationMenu>
+            <NavigationMenu className="!z-[9999]">
               <NavigationMenuList>
                 <NavigationMenuItem>
                   <NavigationMenuTrigger className="text-white hover:text-[#FFD700] transition-colors text-sm lg:text-base bg-transparent hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent data-[state=open]:text-[#FFD700]">
                     Our Services
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className="!bg-black !border !border-gray-700 !shadow-xl min-w-[400px] !z-[100]">
+                  <NavigationMenuContent className="!bg-black !border !border-gray-700 !shadow-xl min-w-[400px] !z-[9999] !relative">
                     <ul className="grid w-[400px] gap-1 p-4 text-white">
                       {services.map((service) => (
                         <li key={service.slug}>
