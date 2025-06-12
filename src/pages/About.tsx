@@ -216,7 +216,7 @@ const About = () => {
                   size="lg" 
                   className="bg-[#FFD700] hover:bg-[#FFE44D] text-black text-xl px-12 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 >
-                  <Link to="/contact">Contact Us Today to Start the Conversation</Link>
+                  <Link to="/contact">Contact Us Today</Link>
                 </Button>
               </CardContent>
             </Card>
