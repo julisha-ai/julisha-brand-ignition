@@ -12,7 +12,7 @@ const About = () => {
           <div 
             className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"
             style={{
-              backgroundImage: 'url(https://res.cloudinary.com/dx6zxdlts/image/upload/v1749649191/laptop-with-glowing-screen-table-dark-top-view-copy-space_qatkvc.jpg)',
+              backgroundImage: 'url(https://res.cloudinary.com/dx6zxdlts/video/upload/v1714847232/bg_wtolgr.mp4)',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat'
