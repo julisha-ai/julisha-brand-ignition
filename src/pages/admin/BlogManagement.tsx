@@ -38,7 +38,7 @@ export default function BlogManagement() {
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('blog_posts')
         .select('*')
         .order('created_at', { ascending: false });
@@ -68,7 +68,7 @@ export default function BlogManagement() {
     if (!confirm("Are you sure you want to delete this post?")) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('blog_posts')
         .delete()
         .eq('id', id);
