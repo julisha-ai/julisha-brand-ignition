@@ -80,13 +80,23 @@ export default function Header() {
             </NavigationMenu>
           </nav>
 
-          <Button
-            asChild
-            size="lg"
-            className="bg-[#FFD700] hover:bg-[#FFE44D] text-black border-2 border-[#FFD700] hidden md:inline-flex"
-          >
-            <Link to="/contact">Request Demo</Link>
-          </Button>
+          <div className="hidden md:flex items-center gap-4">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="border-[#FFD700] text-[#FFD700] hover:bg-[#FFD700] hover:text-black"
+            >
+              <Link to="/login">Admin</Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              className="bg-[#FFD700] hover:bg-[#FFE44D] text-black border-2 border-[#FFD700]"
+            >
+              <Link to="/contact">Request Demo</Link>
+            </Button>
+          </div>
 
           <Button
             variant="outline"
