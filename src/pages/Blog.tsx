@@ -13,8 +13,16 @@ import {
   User, 
   Eye,
   Webhook,
-  Settings 
+  Settings,
+  AlertCircle,
+  CheckCircle2
 } from "lucide-react";
+import { 
+  validateWebhookData, 
+  generateWebhookUrl, 
+  createTestPayload,
+  type ProcessedBlogPost 
+} from "@/lib/webhooks";
 
 interface BlogPost {
   id: string;
@@ -48,6 +56,7 @@ const Blog = () => {
   const [showEditor, setShowEditor] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
   const [incomingWebhookUrl, setIncomingWebhookUrl] = useState("");
+  const [webhookStatus, setWebhookStatus] = useState<"idle" | "testing" | "success" | "error">("idle");
   const [currentPost, setCurrentPost] = useState<Partial<BlogPost>>({
     title: "",
     content: "",
@@ -56,48 +65,132 @@ const Blog = () => {
     status: "draft"
   });
 
-  // Generate a unique incoming webhook URL for this blog
-  const generateIncomingWebhookUrl = () => {
-    const baseUrl = window.location.origin;
-    const webhookId = Math.random().toString(36).substring(2, 15);
-    return `${baseUrl}/api/webhooks/blog/${webhookId}`;
-  };
-
-  // Handle incoming blog posts from Make.com/n8n
+  // Handle incoming blog posts from Make.com/n8n with validation
   const handleIncomingPost = (postData: any) => {
-    const newPost: BlogPost = {
-      id: Date.now().toString(),
-      title: postData.title || "Untitled Post",
-      content: postData.content || "",
-      excerpt: postData.excerpt || postData.content?.substring(0, 150) + "..." || "",
-      author: postData.author || "Automation",
-      publishedAt: postData.publishedAt || new Date().toISOString().split('T')[0],
-      status: postData.status || "published",
-      tags: postData.tags || [],
-      category: postData.category || "General",
-      seoTitle: postData.seoTitle,
-      seoDescription: postData.seoDescription,
-      featuredImage: postData.featuredImage
-    };
+    const validation = validateWebhookData(postData);
+    
+    if (!validation.isValid) {
+      console.error("Webhook validation failed:", validation.errors);
+      toast({
+        title: "Invalid Webhook Data",
+        description: `Failed to process blog post: ${validation.errors.join(", ")}`,
+        variant: "destructive",
+      });
+      return false;
+    }
 
+    if (!validation.processedData) {
+      toast({
+        title: "Processing Error",
+        description: "Failed to process the webhook data",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    const newPost: BlogPost = validation.processedData;
     setPosts(prev => [newPost, ...prev]);
     
     toast({
       title: "New Post Received",
       description: `Blog post "${newPost.title}" added via automation`,
     });
+    
+    return true;
   };
 
-  // Set up message listener for incoming webhooks (simulated)
+  // Set up webhook handling system
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data.type === 'incoming_blog_post') {
-        handleIncomingPost(event.data.post);
+        const success = handleIncomingPost(event.data.post);
+        setWebhookStatus(success ? "success" : "error");
+        
+        // Reset status after 3 seconds
+        setTimeout(() => setWebhookStatus("idle"), 3000);
+      }
+    };
+
+    // Handle simulated webhook requests via fetch interception
+    const handleFetch = (event: any) => {
+      if (event.request?.url?.includes('/api/webhooks/blog/')) {
+        event.respondWith(
+          new Promise(async (resolve) => {
+            try {
+              const requestBody = await event.request.text();
+              const postData = JSON.parse(requestBody);
+              
+              const success = handleIncomingPost(postData);
+              
+              resolve(new Response(
+                JSON.stringify({ 
+                  success, 
+                  message: success ? "Blog post created successfully" : "Failed to create blog post" 
+                }),
+                { 
+                  status: success ? 200 : 400,
+                  headers: { 'Content-Type': 'application/json' }
+                }
+              ));
+            } catch (error) {
+              resolve(new Response(
+                JSON.stringify({ success: false, message: "Invalid JSON data" }),
+                { 
+                  status: 400,
+                  headers: { 'Content-Type': 'application/json' }
+                }
+              ));
+            }
+          })
+        );
       }
     };
 
     window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    
+    // Register service worker for webhook handling if not already registered
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/webhook-sw.js').catch(() => {
+        // Fallback: create inline service worker
+        const swCode = `
+          self.addEventListener('fetch', function(event) {
+            if (event.request.url.includes('/api/webhooks/blog/') && event.request.method === 'POST') {
+              event.respondWith(
+                event.request.text().then(body => {
+                  // Send message to main thread
+                  self.clients.matchAll().then(clients => {
+                    clients.forEach(client => {
+                      try {
+                        const postData = JSON.parse(body);
+                        client.postMessage({
+                          type: 'incoming_blog_post',
+                          post: postData
+                        });
+                      } catch (e) {
+                        console.error('Failed to parse webhook data:', e);
+                      }
+                    });
+                  });
+                  
+                  return new Response(JSON.stringify({success: true}), {
+                    status: 200,
+                    headers: {'Content-Type': 'application/json'}
+                  });
+                })
+              );
+            }
+          });
+        `;
+        
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl);
+      });
+    }
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
   }, []);
 
   const handleSavePost = (overrideStatus?: "draft" | "published") => {
@@ -282,7 +375,7 @@ const Blog = () => {
                     variant="outline" 
                     size="sm"
                     onClick={() => {
-                      const url = generateIncomingWebhookUrl();
+                      const url = generateWebhookUrl();
                       setIncomingWebhookUrl(url);
                       navigator.clipboard.writeText(url);
                       toast({
@@ -299,21 +392,35 @@ const Blog = () => {
                     variant="outline" 
                     size="sm"
                     onClick={() => {
-                      // Simulate incoming webhook with test data
-                      const testPost = {
-                        title: "Test Post from Make.com Automation",
-                        content: "This is a test blog post created via Make.com automation. It demonstrates how external systems can automatically post content to your blog. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                        excerpt: "A test post demonstrating automated blog posting",
-                        author: "Make.com Bot",
-                        tags: ["automation", "test", "make.com"],
-                        category: "Technology"
-                      };
-                      handleIncomingPost(testPost);
+                      setWebhookStatus("testing");
+                      const testPost = createTestPayload();
+                      const success = handleIncomingPost(testPost);
+                      setWebhookStatus(success ? "success" : "error");
+                      
+                      // Reset status after 3 seconds
+                      setTimeout(() => setWebhookStatus("idle"), 3000);
                     }}
                     className="w-full"
+                    disabled={webhookStatus === "testing"}
                   >
-                    <Eye className="w-4 h-4 mr-2" />
-                    Test Incoming Post
+                    {webhookStatus === "testing" ? (
+                      <>Testing...</>
+                    ) : webhookStatus === "success" ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 mr-2 text-green-600" />
+                        Test Passed
+                      </>
+                    ) : webhookStatus === "error" ? (
+                      <>
+                        <AlertCircle className="w-4 h-4 mr-2 text-red-600" />
+                        Test Failed
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-4 h-4 mr-2" />
+                        Test Incoming Post
+                      </>
+                    )}
                   </Button>
                   <p className="text-xs text-muted-foreground">
                     Use this URL in Make.com/n8n to automatically post blogs here

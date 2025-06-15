@@ -1,117 +1,129 @@
-// Webhook utility functions for Make.com integration
-
-export interface WebhookPayload {
-  event: string;
-  timestamp: string;
-  site: {
-    name: string;
-    url: string;
-  };
-  post: {
-    id: string;
-    title: string;
-    content: string;
-    excerpt: string;
-    author: string;
-    publishedAt: string;
-    status: string;
-    tags: string[];
-    category: string;
-    seo: {
-      title: string;
-      description: string;
-    };
-    featuredImage: string | null;
-    wordCount: number;
-    readingTime: number;
-    url: string;
-  };
-  automation: {
-    source: string;
-    version: string;
-  };
+// Webhook handling service for blog posts
+export interface WebhookBlogPost {
+  title?: string;
+  content?: string;
+  excerpt?: string;
+  author?: string;
+  publishedAt?: string;
+  status?: "draft" | "published";
+  tags?: string[];
+  category?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  featuredImage?: string;
 }
 
-export const createWebhookPayload = (post: any): WebhookPayload => {
-  return {
-    event: "blog_post_published",
-    timestamp: new Date().toISOString(),
-    site: {
-      name: "Julisha Solutions",
-      url: window.location.origin,
-    },
-    post: {
-      id: post.id,
-      title: post.title,
-      content: post.content,
-      excerpt: post.excerpt,
-      author: post.author,
-      publishedAt: post.publishedAt,
-      status: post.status,
-      tags: post.tags || [],
-      category: post.category || "General",
-      seo: {
-        title: post.seoTitle || post.title,
-        description: post.seoDescription || post.excerpt,
-      },
-      featuredImage: post.featuredImage || null,
-      wordCount: post.content.split(' ').length,
-      readingTime: Math.ceil(post.content.split(' ').length / 200),
-      url: `${window.location.origin}/blog/post/${post.id}`,
-    },
-    automation: {
-      source: "julisha-blog-cms",
-      version: "1.0",
+export interface ProcessedBlogPost {
+  id: string;
+  title: string;
+  content: string;
+  excerpt: string;
+  author: string;
+  publishedAt: string;
+  status: "draft" | "published";
+  tags?: string[];
+  category?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  featuredImage?: string;
+}
+
+// Validate and process incoming webhook data
+export const validateWebhookData = (data: any): { isValid: boolean; errors: string[]; processedData?: ProcessedBlogPost } => {
+  const errors: string[] = [];
+  
+  // Check if data is an object
+  if (!data || typeof data !== 'object') {
+    errors.push('Invalid data format: expected JSON object');
+    return { isValid: false, errors };
+  }
+
+  // Validate required fields
+  if (!data.title || typeof data.title !== 'string' || data.title.trim() === '') {
+    errors.push('Title is required and must be a non-empty string');
+  }
+
+  if (!data.content || typeof data.content !== 'string' || data.content.trim() === '') {
+    errors.push('Content is required and must be a non-empty string');
+  }
+
+  // Validate optional fields
+  if (data.status && !['draft', 'published'].includes(data.status)) {
+    errors.push('Status must be either "draft" or "published"');
+  }
+
+  if (data.tags && !Array.isArray(data.tags)) {
+    errors.push('Tags must be an array of strings');
+  }
+
+  if (data.publishedAt && typeof data.publishedAt === 'string') {
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(data.publishedAt)) {
+      errors.push('PublishedAt must be in YYYY-MM-DD format');
     }
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, errors };
+  }
+
+  // Process and normalize the data
+  const processedData: ProcessedBlogPost = {
+    id: Date.now().toString(),
+    title: data.title.trim(),
+    content: data.content.trim(),
+    excerpt: data.excerpt?.trim() || data.content.substring(0, 150).trim() + "...",
+    author: data.author?.trim() || "Automation",
+    publishedAt: data.publishedAt || new Date().toISOString().split('T')[0],
+    status: data.status || "published",
+    tags: Array.isArray(data.tags) ? data.tags.filter(tag => typeof tag === 'string' && tag.trim()) : [],
+    category: data.category?.trim() || "General",
+    seoTitle: data.seoTitle?.trim(),
+    seoDescription: data.seoDescription?.trim(),
+    featuredImage: data.featuredImage?.trim()
   };
+
+  return { isValid: true, errors: [], processedData };
 };
 
-export const triggerMakeWebhook = async (webhookUrl: string, payload: WebhookPayload): Promise<boolean> => {
-  try {
-    console.log("Triggering Make.com webhook:", webhookUrl, payload);
-    
-    await fetch(webhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      mode: "no-cors",
-      body: JSON.stringify(payload),
-    });
+// Generate unique webhook URLs
+export const generateWebhookUrl = (): string => {
+  const baseUrl = window.location.origin;
+  const webhookId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  return `${baseUrl}/api/webhooks/blog/${webhookId}`;
+};
 
-    return true;
-  } catch (error) {
-    console.error("Webhook error:", error);
+// Webhook URL validation
+export const isValidWebhookUrl = (url: string): boolean => {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.pathname.startsWith('/api/webhooks/blog/') && urlObj.pathname.length > '/api/webhooks/blog/'.length;
+  } catch {
     return false;
   }
 };
 
-// Test webhook function for validation
-export const testWebhook = async (webhookUrl: string): Promise<boolean> => {
-  const testPayload = {
-    event: "test_connection",
-    timestamp: new Date().toISOString(),
-    site: {
-      name: "Julisha Solutions",
-      url: window.location.origin,
-    },
-    test: true,
-    message: "This is a test webhook from Julisha Solutions Blog CMS"
-  };
-
+// Extract webhook ID from URL
+export const extractWebhookId = (url: string): string | null => {
   try {
-    await fetch(webhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      mode: "no-cors",
-      body: JSON.stringify(testPayload),
-    });
-
-    return true;
-  } catch (error) {
-    console.error("Test webhook error:", error);
-    return false;
+    const urlObj = new URL(url);
+    const pathParts = urlObj.pathname.split('/');
+    if (pathParts.length >= 4 && pathParts[1] === 'api' && pathParts[2] === 'webhooks' && pathParts[3] === 'blog') {
+      return pathParts[4] || null;
+    }
+    return null;
+  } catch {
+    return null;
   }
 };
+
+// Create a test webhook payload
+export const createTestPayload = (): WebhookBlogPost => ({
+  title: "Test Post from Make.com Automation",
+  content: "This is a test blog post created via Make.com automation. It demonstrates how external systems can automatically post content to your blog. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+  excerpt: "A test post demonstrating automated blog posting capabilities",
+  author: "Make.com Bot",
+  tags: ["automation", "test", "make.com", "webhook"],
+  category: "Technology",
+  status: "published"
+});
