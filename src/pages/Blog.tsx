@@ -354,24 +354,26 @@ const Blog = () => {
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
-                      onClick={() => setCurrentPost({...currentPost, status: "draft"})}
-                      className={currentPost.status === "draft" ? "bg-gray-200" : ""}
+                      onClick={() => {
+                        setCurrentPost({...currentPost, status: "draft"});
+                        setTimeout(() => handleSavePost(), 0);
+                      }}
                     >
                       Save as Draft
                     </Button>
                     <Button
-                      onClick={() => setCurrentPost({...currentPost, status: "published"})}
-                      className={`${currentPost.status === "published" ? "bg-[#FFD700] text-black" : "bg-green-600 hover:bg-green-700"}`}
+                      onClick={() => {
+                        setCurrentPost({...currentPost, status: "published"});
+                        setTimeout(() => handleSavePost(), 0);
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white"
                     >
-                      Publish
+                      Publish Now
                     </Button>
                   </div>
                   <div className="flex gap-2">
                     <Button variant="outline" onClick={() => setShowEditor(false)}>
                       Cancel
-                    </Button>
-                    <Button onClick={handleSavePost} className="bg-[#FFD700] hover:bg-[#FFE44D] text-black">
-                      Save Post
                     </Button>
                   </div>
                 </div>
