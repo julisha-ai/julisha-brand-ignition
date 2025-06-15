@@ -35,6 +35,7 @@ const Blog = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
+  const [showPublishedOnly, setShowPublishedOnly] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
   const [incomingWebhookUrl, setIncomingWebhookUrl] = useState("");
   const [currentPost, setCurrentPost] = useState({
@@ -290,6 +291,14 @@ const Blog = () => {
             </div>
             <div className="flex gap-2">
               <Button 
+                variant={showPublishedOnly ? "default" : "outline"}
+                onClick={() => setShowPublishedOnly(!showPublishedOnly)}
+                className={showPublishedOnly ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                {showPublishedOnly ? "Show All Posts" : "Published Only"}
+              </Button>
+              <Button 
                 onClick={() => setShowEditor(!showEditor)}
                 className="bg-[#FFD700] hover:bg-[#FFE44D] text-black"
               >
@@ -437,7 +446,9 @@ const Blog = () => {
 
           {/* Blog Posts Grid */}
           <div className="grid gap-6">
-            {posts.map((post) => (
+            {posts
+              .filter(post => showPublishedOnly ? post.published : true)
+              .map((post) => (
               <Card key={post.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
@@ -486,12 +497,19 @@ const Blog = () => {
             ))}
           </div>
 
-          {posts.length === 0 && (
+          {posts.filter(post => showPublishedOnly ? post.published : true).length === 0 && (
             <Card className="text-center py-12">
               <CardContent>
                 <PlusCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">No blog posts yet</h3>
-                <p className="text-muted-foreground mb-4">Create your first blog post to get started</p>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {showPublishedOnly ? "No published posts yet" : "No blog posts yet"}
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  {showPublishedOnly 
+                    ? "Publish a post to see it here" 
+                    : "Create your first blog post to get started"
+                  }
+                </p>
                 <Button 
                   onClick={() => setShowEditor(true)}
                   className="bg-[#FFD700] hover:bg-[#FFE44D] text-black"
