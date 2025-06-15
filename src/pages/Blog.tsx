@@ -24,6 +24,11 @@ interface BlogPost {
   author: string;
   publishedAt: string;
   status: "draft" | "published";
+  tags?: string[];
+  category?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  featuredImage?: string;
 }
 
 const Blog = () => {
@@ -87,25 +92,60 @@ const Blog = () => {
 
   const triggerWebhook = async (post: BlogPost) => {
     try {
+      const webhookPayload = {
+        event: "blog_post_published",
+        timestamp: new Date().toISOString(),
+        site: {
+          name: "Julisha Solutions",
+          url: window.location.origin,
+        },
+        post: {
+          id: post.id,
+          title: post.title,
+          content: post.content,
+          excerpt: post.excerpt,
+          author: post.author,
+          publishedAt: post.publishedAt,
+          status: post.status,
+          tags: post.tags || [],
+          category: post.category || "General",
+          seo: {
+            title: post.seoTitle || post.title,
+            description: post.seoDescription || post.excerpt,
+          },
+          featuredImage: post.featuredImage || null,
+          wordCount: post.content.split(' ').length,
+          readingTime: Math.ceil(post.content.split(' ').length / 200), // Average reading speed
+          url: `${window.location.origin}/blog/post/${post.id}`,
+        },
+        automation: {
+          source: "julisha-blog-cms",
+          version: "1.0",
+        }
+      };
+
+      console.log("Triggering webhook with payload:", webhookPayload);
+
       await fetch(webhookUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         mode: "no-cors",
-        body: JSON.stringify({
-          type: "blog_post_published",
-          data: post,
-          timestamp: new Date().toISOString(),
-        }),
+        body: JSON.stringify(webhookPayload),
       });
 
       toast({
-        title: "Webhook Triggered",
-        description: "Automation workflow has been notified",
+        title: "Webhook Triggered Successfully",
+        description: "Make.com automation workflow has been notified with optimized data structure",
       });
     } catch (error) {
       console.error("Webhook error:", error);
+      toast({
+        title: "Webhook Error",
+        description: "Failed to trigger automation. Please check your webhook URL.",
+        variant: "destructive",
+      });
     }
   };
 
