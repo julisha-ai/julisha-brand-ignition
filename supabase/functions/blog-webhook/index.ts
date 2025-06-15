@@ -31,7 +31,27 @@ serve(async (req) => {
   }
 
   try {
-    const payload: BlogPostPayload = await req.json();
+    // Get raw text first to handle potential JSON parsing issues
+    const rawBody = await req.text();
+    console.log('Raw request body received:', rawBody);
+    
+    let payload: BlogPostPayload;
+    try {
+      payload = JSON.parse(rawBody);
+    } catch (parseError) {
+      console.error('JSON parsing error:', parseError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid JSON format',
+          details: parseError.message,
+          received: rawBody.substring(0, 200) + (rawBody.length > 200 ? '...' : '')
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
     
     // Validate required fields
     if (!payload.title?.trim() || !payload.content?.trim()) {
