@@ -100,7 +100,7 @@ const Blog = () => {
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  const handleSavePost = () => {
+  const handleSavePost = (overrideStatus?: "draft" | "published") => {
     if (!currentPost.title || !currentPost.content) {
       toast({
         title: "Error",
@@ -110,6 +110,8 @@ const Blog = () => {
       return;
     }
 
+    const finalStatus = overrideStatus || currentPost.status || "draft";
+
     const newPost: BlogPost = {
       id: Date.now().toString(),
       title: currentPost.title || "",
@@ -117,7 +119,7 @@ const Blog = () => {
       excerpt: currentPost.excerpt || currentPost.content?.substring(0, 150) + "..." || "",
       author: currentPost.author || "Anonymous",
       publishedAt: new Date().toISOString().split('T')[0],
-      status: currentPost.status as "draft" | "published" || "draft"
+      status: finalStatus
     };
 
     setPosts([newPost, ...posts]);
@@ -126,7 +128,7 @@ const Blog = () => {
     
     toast({
       title: "Success",
-      description: "Blog post saved successfully",
+      description: `Blog post ${finalStatus === "published" ? "published" : "saved as draft"} successfully`,
     });
 
     // Trigger webhook if configured and post is published
@@ -354,18 +356,12 @@ const Blog = () => {
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
-                      onClick={() => {
-                        setCurrentPost({...currentPost, status: "draft"});
-                        setTimeout(() => handleSavePost(), 0);
-                      }}
+                      onClick={() => handleSavePost("draft")}
                     >
                       Save as Draft
                     </Button>
                     <Button
-                      onClick={() => {
-                        setCurrentPost({...currentPost, status: "published"});
-                        setTimeout(() => handleSavePost(), 0);
-                      }}
+                      onClick={() => handleSavePost("published")}
                       className="bg-green-600 hover:bg-green-700 text-white"
                     >
                       Publish Now
