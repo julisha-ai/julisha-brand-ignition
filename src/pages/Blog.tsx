@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -47,6 +47,7 @@ const Blog = () => {
   
   const [showEditor, setShowEditor] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
+  const [incomingWebhookUrl, setIncomingWebhookUrl] = useState("");
   const [currentPost, setCurrentPost] = useState<Partial<BlogPost>>({
     title: "",
     content: "",
@@ -54,6 +55,50 @@ const Blog = () => {
     author: "",
     status: "draft"
   });
+
+  // Generate a unique incoming webhook URL for this blog
+  const generateIncomingWebhookUrl = () => {
+    const baseUrl = window.location.origin;
+    const webhookId = Math.random().toString(36).substring(2, 15);
+    return `${baseUrl}/api/webhooks/blog/${webhookId}`;
+  };
+
+  // Handle incoming blog posts from Make.com/n8n
+  const handleIncomingPost = (postData: any) => {
+    const newPost: BlogPost = {
+      id: Date.now().toString(),
+      title: postData.title || "Untitled Post",
+      content: postData.content || "",
+      excerpt: postData.excerpt || postData.content?.substring(0, 150) + "..." || "",
+      author: postData.author || "Automation",
+      publishedAt: postData.publishedAt || new Date().toISOString().split('T')[0],
+      status: postData.status || "published",
+      tags: postData.tags || [],
+      category: postData.category || "General",
+      seoTitle: postData.seoTitle,
+      seoDescription: postData.seoDescription,
+      featuredImage: postData.featuredImage
+    };
+
+    setPosts(prev => [newPost, ...prev]);
+    
+    toast({
+      title: "New Post Received",
+      description: `Blog post "${newPost.title}" added via automation`,
+    });
+  };
+
+  // Set up message listener for incoming webhooks (simulated)
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'incoming_blog_post') {
+        handleIncomingPost(event.data.post);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   const handleSavePost = () => {
     if (!currentPost.title || !currentPost.content) {
@@ -179,41 +224,102 @@ const Blog = () => {
           </div>
 
           {/* Webhook Configuration */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Webhook className="w-5 h-5" />
-                Automation Webhook (Make.com / n8n)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Enter your webhook URL (e.g., https://hook.make.com/...)"
-                  value={webhookUrl}
-                  onChange={(e) => setWebhookUrl(e.target.value)}
-                  className="flex-1"
-                />
-                <Button 
-                  variant="outline"
-                  onClick={() => {
-                    if (webhookUrl) {
+          <div className="grid gap-6 mb-8 md:grid-cols-2">
+            {/* Outgoing Webhook */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Webhook className="w-5 h-5" />
+                  Outgoing Webhook
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <Input
+                    placeholder="Enter your webhook URL (e.g., https://hook.make.com/...)"
+                    value={webhookUrl}
+                    onChange={(e) => setWebhookUrl(e.target.value)}
+                  />
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (webhookUrl) {
+                        toast({
+                          title: "Webhook Saved",
+                          description: "Automation will be triggered for published posts",
+                        });
+                      }
+                    }}
+                    className="w-full"
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Save Outgoing URL
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Triggers when you publish posts manually
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Incoming Webhook */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Webhook className="w-5 h-5 rotate-180" />
+                  Incoming Webhook
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="p-3 bg-gray-50 rounded border text-sm font-mono break-all">
+                    {incomingWebhookUrl || "Click generate to create URL"}
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      const url = generateIncomingWebhookUrl();
+                      setIncomingWebhookUrl(url);
+                      navigator.clipboard.writeText(url);
                       toast({
-                        title: "Webhook Saved",
-                        description: "Automation will be triggered for published posts",
+                        title: "Webhook URL Generated",
+                        description: "URL copied to clipboard! Use this in Make.com/n8n to POST blog posts here.",
                       });
-                    }
-                  }}
-                >
-                  <Settings className="w-4 h-4 mr-2" />
-                  Save
-                </Button>
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">
-                Configure your Make.com or n8n webhook URL to automatically trigger workflows when posts are published.
-              </p>
-            </CardContent>
-          </Card>
+                    }}
+                    className="w-full"
+                  >
+                    <PlusCircle className="w-4 h-4 mr-2" />
+                    Generate & Copy URL
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      // Simulate incoming webhook with test data
+                      const testPost = {
+                        title: "Test Post from Make.com Automation",
+                        content: "This is a test blog post created via Make.com automation. It demonstrates how external systems can automatically post content to your blog. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                        excerpt: "A test post demonstrating automated blog posting",
+                        author: "Make.com Bot",
+                        tags: ["automation", "test", "make.com"],
+                        category: "Technology"
+                      };
+                      handleIncomingPost(testPost);
+                    }}
+                    className="w-full"
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    Test Incoming Post
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Use this URL in Make.com/n8n to automatically post blogs here
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Post Editor */}
           {showEditor && (
