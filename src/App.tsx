@@ -15,6 +15,7 @@ import ServicePage from "./pages/services/[slug]";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import BlogManagement from "./pages/admin/BlogManagement";
+import ContactManagement from "./pages/admin/ContactManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/blog" element={<BlogManagement />} />
+            <Route path="/admin/contacts" element={<ContactManagement />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

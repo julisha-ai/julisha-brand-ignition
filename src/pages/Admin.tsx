@@ -102,6 +102,23 @@ export default function Admin() {
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                Contact Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                View and manage contact form submissions
+              </p>
+              <Button className="w-full" onClick={() => navigate("/admin/contacts")}>
+                View Contacts
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-primary" />
                 Analytics
               </CardTitle>

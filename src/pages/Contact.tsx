@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Phone, Mail, Clock, Send, Zap } from "lucide-react";
 
 const Contact = () => {
@@ -26,10 +27,31 @@ const Contact = () => {
     setLoading(true);
 
     try {
-      // Here you would typically send to your backend/Supabase
-      // For now, we'll simulate the form submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      // Save contact form submission to Supabase
+      const { data, error } = await supabase
+        .from('contact_submissions')
+        .insert([{
+          name: formData.name,
+          email: formData.email,
+          company: formData.company || null,
+          phone: formData.phone || null,
+          service: formData.service || null,
+          budget: formData.budget || null,
+          message: formData.message,
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error saving contact submission:', error);
+        toast({
+          title: "Error",
+          description: "Failed to send message. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({
         title: "Message Sent Successfully!",
         description: "We'll get back to you within 24 hours.",
@@ -46,6 +68,7 @@ const Contact = () => {
         message: "",
       });
     } catch (error) {
+      console.error('Unexpected error:', error);
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
