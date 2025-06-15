@@ -11,6 +11,9 @@ import Blog from "./pages/Blog";
 import BlogPublic from "./pages/BlogPublic";
 import Services from "./pages/services";
 import ServicePage from "./pages/services/[slug]";
+import Login from "./pages/Login";
+import Admin from "./pages/Admin";
+import BlogManagement from "./pages/admin/BlogManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +32,9 @@ const App = () => (
             <Route path="/blog/public" element={<BlogPublic />} />
             <Route path="/services" element={<Services />} />
             <Route path="/services/:slug" element={<ServicePage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/blog" element={<BlogManagement />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>
