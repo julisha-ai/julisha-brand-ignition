@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,187 +15,78 @@ import {
   User, 
   Eye,
   Webhook,
-  Settings,
-  AlertCircle,
-  CheckCircle2
+  Settings
 } from "lucide-react";
-import { 
-  validateWebhookData, 
-  generateWebhookUrl, 
-  createTestPayload,
-  type ProcessedBlogPost 
-} from "@/lib/webhooks";
 
 interface BlogPost {
   id: string;
   title: string;
   content: string;
   excerpt: string;
-  author: string;
-  publishedAt: string;
-  status: "draft" | "published";
-  tags?: string[];
-  category?: string;
-  seoTitle?: string;
-  seoDescription?: string;
-  featuredImage?: string;
+  author_id?: string;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 const Blog = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const [posts, setPosts] = useState<BlogPost[]>([
-    {
-      id: "1",
-      title: "Welcome to Julisha Solutions Blog",
-      content: "This is the beginning of our journey...",
-      excerpt: "An introduction to our mission and vision",
-      author: "Julisha Team",
-      publishedAt: "2024-01-15",
-      status: "published"
-    }
-  ]);
-  
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
   const [incomingWebhookUrl, setIncomingWebhookUrl] = useState("");
-  const [webhookStatus, setWebhookStatus] = useState<"idle" | "testing" | "success" | "error">("idle");
-  const [currentPost, setCurrentPost] = useState<Partial<BlogPost>>({
+  const [currentPost, setCurrentPost] = useState({
     title: "",
     content: "",
     excerpt: "",
-    author: "",
-    status: "draft"
+    published: false
   });
 
-  // Handle incoming blog posts from Make.com/n8n with validation
-  const handleIncomingPost = (postData: any) => {
-    const validation = validateWebhookData(postData);
-    
-    if (!validation.isValid) {
-      console.error("Webhook validation failed:", validation.errors);
+  // Check authentication and fetch posts
+  useEffect(() => {
+    const checkAuthAndFetchPosts = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/login");
+        return;
+      }
+      await fetchPosts();
+    };
+
+    checkAuthAndFetchPosts();
+  }, [navigate]);
+
+  const fetchPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch blog posts",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setPosts(data || []);
+    } catch (error) {
       toast({
-        title: "Invalid Webhook Data",
-        description: `Failed to process blog post: ${validation.errors.join(", ")}`,
+        title: "Error",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
-      return false;
+    } finally {
+      setLoading(false);
     }
-
-    if (!validation.processedData) {
-      toast({
-        title: "Processing Error",
-        description: "Failed to process the webhook data",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    const newPost: BlogPost = validation.processedData;
-    setPosts(prev => [newPost, ...prev]);
-    
-    toast({
-      title: "New Post Received",
-      description: `Blog post "${newPost.title}" added via automation`,
-    });
-    
-    return true;
   };
 
-  // Set up webhook handling system
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'incoming_blog_post') {
-        const success = handleIncomingPost(event.data.post);
-        setWebhookStatus(success ? "success" : "error");
-        
-        // Reset status after 3 seconds
-        setTimeout(() => setWebhookStatus("idle"), 3000);
-      }
-    };
-
-    // Handle simulated webhook requests via fetch interception
-    const handleFetch = (event: any) => {
-      if (event.request?.url?.includes('/api/webhooks/blog/')) {
-        event.respondWith(
-          new Promise(async (resolve) => {
-            try {
-              const requestBody = await event.request.text();
-              const postData = JSON.parse(requestBody);
-              
-              const success = handleIncomingPost(postData);
-              
-              resolve(new Response(
-                JSON.stringify({ 
-                  success, 
-                  message: success ? "Blog post created successfully" : "Failed to create blog post" 
-                }),
-                { 
-                  status: success ? 200 : 400,
-                  headers: { 'Content-Type': 'application/json' }
-                }
-              ));
-            } catch (error) {
-              resolve(new Response(
-                JSON.stringify({ success: false, message: "Invalid JSON data" }),
-                { 
-                  status: 400,
-                  headers: { 'Content-Type': 'application/json' }
-                }
-              ));
-            }
-          })
-        );
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    
-    // Register service worker for webhook handling if not already registered
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/webhook-sw.js').catch(() => {
-        // Fallback: create inline service worker
-        const swCode = `
-          self.addEventListener('fetch', function(event) {
-            if (event.request.url.includes('/api/webhooks/blog/') && event.request.method === 'POST') {
-              event.respondWith(
-                event.request.text().then(body => {
-                  // Send message to main thread
-                  self.clients.matchAll().then(clients => {
-                    clients.forEach(client => {
-                      try {
-                        const postData = JSON.parse(body);
-                        client.postMessage({
-                          type: 'incoming_blog_post',
-                          post: postData
-                        });
-                      } catch (e) {
-                        console.error('Failed to parse webhook data:', e);
-                      }
-                    });
-                  });
-                  
-                  return new Response(JSON.stringify({success: true}), {
-                    status: 200,
-                    headers: {'Content-Type': 'application/json'}
-                  });
-                })
-              );
-            }
-          });
-        `;
-        
-        const blob = new Blob([swCode], { type: 'application/javascript' });
-        const swUrl = URL.createObjectURL(blob);
-        navigator.serviceWorker.register(swUrl);
-      });
-    }
-
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, []);
-
-  const handleSavePost = (overrideStatus?: "draft" | "published") => {
+  const handleSavePost = async (published: boolean = false) => {
     if (!currentPost.title || !currentPost.content) {
       toast({
         title: "Error",
@@ -203,30 +96,51 @@ const Blog = () => {
       return;
     }
 
-    const finalStatus = overrideStatus || currentPost.status || "draft";
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const postData = {
+        title: currentPost.title,
+        content: currentPost.content,
+        excerpt: currentPost.excerpt || currentPost.content.substring(0, 150) + "...",
+        published,
+        author_id: session?.user?.id
+      };
 
-    const newPost: BlogPost = {
-      id: Date.now().toString(),
-      title: currentPost.title || "",
-      content: currentPost.content || "",
-      excerpt: currentPost.excerpt || currentPost.content?.substring(0, 150) + "..." || "",
-      author: currentPost.author || "Anonymous",
-      publishedAt: new Date().toISOString().split('T')[0],
-      status: finalStatus
-    };
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .insert([postData])
+        .select()
+        .single();
 
-    setPosts([newPost, ...posts]);
-    setCurrentPost({ title: "", content: "", excerpt: "", author: "", status: "draft" });
-    setShowEditor(false);
-    
-    toast({
-      title: "Success",
-      description: `Blog post ${finalStatus === "published" ? "published" : "saved as draft"} successfully`,
-    });
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to save blog post",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    // Trigger webhook if configured and post is published
-    if (webhookUrl && newPost.status === "published") {
-      triggerWebhook(newPost);
+      setPosts(prev => [data, ...prev]);
+      setCurrentPost({ title: "", content: "", excerpt: "", published: false });
+      setShowEditor(false);
+      
+      toast({
+        title: "Success",
+        description: `Blog post ${published ? "published" : "saved as draft"} successfully`,
+      });
+
+      // Trigger webhook if configured and post is published
+      if (webhookUrl && published) {
+        triggerWebhook(data);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
     }
   };
 
@@ -244,18 +158,10 @@ const Blog = () => {
           title: post.title,
           content: post.content,
           excerpt: post.excerpt,
-          author: post.author,
-          publishedAt: post.publishedAt,
-          status: post.status,
-          tags: post.tags || [],
-          category: post.category || "General",
-          seo: {
-            title: post.seoTitle || post.title,
-            description: post.seoDescription || post.excerpt,
-          },
-          featuredImage: post.featuredImage || null,
+          published: post.published,
+          created_at: post.created_at,
           wordCount: post.content.split(' ').length,
-          readingTime: Math.ceil(post.content.split(' ').length / 200), // Average reading speed
+          readingTime: Math.ceil(post.content.split(' ').length / 200),
           url: `${window.location.origin}/blog/post/${post.id}`,
         },
         automation: {
@@ -277,7 +183,7 @@ const Blog = () => {
 
       toast({
         title: "Webhook Triggered Successfully",
-        description: "Make.com automation workflow has been notified with optimized data structure",
+        description: "Make.com automation workflow has been notified",
       });
     } catch (error) {
       console.error("Webhook error:", error);
@@ -289,13 +195,88 @@ const Blog = () => {
     }
   };
 
-  const deletePost = (id: string) => {
-    setPosts(posts.filter(post => post.id !== id));
-    toast({
-      title: "Post Deleted",
-      description: "Blog post has been removed",
-    });
+  const deletePost = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('blog_posts')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete post",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setPosts(posts.filter(post => post.id !== id));
+      toast({
+        title: "Post Deleted",
+        description: "Blog post has been removed",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
   };
+
+  const generateWebhookUrl = () => {
+    const baseUrl = window.location.origin;
+    return `https://vqkzyzlyrkxatgdqjczz.supabase.co/functions/v1/blog-webhook`;
+  };
+
+  const testWebhook = async () => {
+    const webhookUrl = generateWebhookUrl();
+    const testPayload = {
+      title: "Test Blog Post from Automation",
+      content: "This is a test blog post created via webhook to verify the incoming webhook functionality is working correctly.",
+      excerpt: "This is a test blog post created via webhook",
+      published: false
+    };
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(testPayload),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Test Successful",
+          description: "Webhook test completed successfully! Check for the new test post.",
+        });
+        await fetchPosts(); // Refresh the posts to show the new test post
+      } else {
+        toast({
+          title: "Test Failed",
+          description: "Webhook test failed. Please check the logs.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Test Error",
+        description: "Failed to test webhook. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -391,36 +372,11 @@ const Blog = () => {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => {
-                      setWebhookStatus("testing");
-                      const testPost = createTestPayload();
-                      const success = handleIncomingPost(testPost);
-                      setWebhookStatus(success ? "success" : "error");
-                      
-                      // Reset status after 3 seconds
-                      setTimeout(() => setWebhookStatus("idle"), 3000);
-                    }}
+                    onClick={testWebhook}
                     className="w-full"
-                    disabled={webhookStatus === "testing"}
                   >
-                    {webhookStatus === "testing" ? (
-                      <>Testing...</>
-                    ) : webhookStatus === "success" ? (
-                      <>
-                        <CheckCircle2 className="w-4 h-4 mr-2 text-green-600" />
-                        Test Passed
-                      </>
-                    ) : webhookStatus === "error" ? (
-                      <>
-                        <AlertCircle className="w-4 h-4 mr-2 text-red-600" />
-                        Test Failed
-                      </>
-                    ) : (
-                      <>
-                        <Eye className="w-4 h-4 mr-2" />
-                        Test Incoming Post
-                      </>
-                    )}
+                    <Eye className="w-4 h-4 mr-2" />
+                    Test Incoming Webhook
                   </Button>
                   <p className="text-xs text-muted-foreground">
                     Use this URL in Make.com/n8n to automatically post blogs here
@@ -442,11 +398,6 @@ const Blog = () => {
                   value={currentPost.title}
                   onChange={(e) => setCurrentPost({...currentPost, title: e.target.value})}
                 />
-                <Input
-                  placeholder="Author"
-                  value={currentPost.author}
-                  onChange={(e) => setCurrentPost({...currentPost, author: e.target.value})}
-                />
                 <Textarea
                   placeholder="Excerpt (optional)"
                   value={currentPost.excerpt}
@@ -463,12 +414,12 @@ const Blog = () => {
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
-                      onClick={() => handleSavePost("draft")}
+                      onClick={() => handleSavePost(false)}
                     >
                       Save as Draft
                     </Button>
                     <Button
-                      onClick={() => handleSavePost("published")}
+                      onClick={() => handleSavePost(true)}
                       className="bg-green-600 hover:bg-green-700 text-white"
                     >
                       Publish Now
@@ -494,22 +445,22 @@ const Blog = () => {
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-xl font-semibold text-foreground">{post.title}</h3>
                         <span className={`px-2 py-1 rounded-full text-xs ${
-                          post.status === "published" 
+                          post.published 
                             ? "bg-green-100 text-green-800" 
                             : "bg-yellow-100 text-yellow-800"
                         }`}>
-                          {post.status}
+                          {post.published ? "Published" : "Draft"}
                         </span>
                       </div>
                       <p className="text-muted-foreground mb-4">{post.excerpt}</p>
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <User className="w-4 h-4" />
-                          {post.author}
+                          {post.author_id ? "Admin" : "System"}
                         </span>
                         <span className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
-                          {post.publishedAt}
+                          {new Date(post.created_at).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
