@@ -34,10 +34,10 @@ serve(async (req) => {
     const payload: BlogPostPayload = await req.json();
     
     // Validate required fields
-    if (!payload.title || !payload.content) {
+    if (!payload.title?.trim() || !payload.content?.trim()) {
       return new Response(
         JSON.stringify({ 
-          error: 'Missing required fields: title and content are required' 
+          error: 'Missing required fields: title and content cannot be empty' 
         }),
         { 
           status: 400, 
