@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import Layout from "./components/Layout";
+import Analytics from "./components/Analytics";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -17,6 +18,7 @@ import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import BlogManagement from "./pages/admin/BlogManagement";
 import ContactManagement from "./pages/admin/ContactManagement";
+import NewsletterManagement from "./pages/admin/NewsletterManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +29,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <Analytics />
         <BrowserRouter>
           <Layout>
             <Routes>
@@ -41,6 +44,7 @@ const App = () => (
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/blog" element={<BlogManagement />} />
               <Route path="/admin/contacts" element={<ContactManagement />} />
+              <Route path="/admin/newsletter" element={<NewsletterManagement />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>

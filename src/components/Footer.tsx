@@ -1,8 +1,7 @@
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
 import { Link } from "react-router-dom";
 import { services } from "@/lib/services";
+import NewsletterSignup from "./NewsletterSignup";
 
 const footerLinks = [
   {
@@ -75,16 +74,14 @@ export default function Footer() {
 
           <div>
             <h2 className="font-bold text-lg mb-4">Newsletter</h2>
-            <div className="flex gap-2">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="bg-gray-800 border-gray-700"
-              />
-              <Button className="bg-[#FFD700] hover:bg-[#FFE44D] text-black">
-                Subscribe
-              </Button>
-            </div>
+            <p className="text-gray-400 text-sm mb-4">
+              Stay updated with our latest AI insights and solutions
+            </p>
+            <NewsletterSignup 
+              source="footer"
+              placeholder="Enter your email"
+              buttonText="Subscribe"
+            />
             <div className="flex gap-4 mt-6">
               {[
                 { Icon: Facebook, href: "https://www.facebook.com/profile.php?id=61560274963428" },

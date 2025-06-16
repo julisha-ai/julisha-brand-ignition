@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { User, LogOut, FileText, Settings, BarChart3 } from "lucide-react";
+import { User, LogOut, FileText, Settings, BarChart3, Mail } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 export default function Admin() {
@@ -112,6 +112,23 @@ export default function Admin() {
               </p>
               <Button className="w-full" onClick={() => navigate("/admin/contacts")}>
                 View Contacts
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5 text-primary" />
+                Newsletter Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Manage newsletter subscribers and exports
+              </p>
+              <Button className="w-full" onClick={() => navigate("/admin/newsletter")}>
+                Manage Newsletter
               </Button>
             </CardContent>
           </Card>
