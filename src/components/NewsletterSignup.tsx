@@ -93,7 +93,7 @@ const NewsletterSignup = ({
         placeholder={placeholder}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="flex-1"
+        className="flex-1 bg-white text-black border-gray-300 placeholder:text-gray-500"
         disabled={isLoading}
       />
       <Button 
