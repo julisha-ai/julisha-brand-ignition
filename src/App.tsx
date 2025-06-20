@@ -12,6 +12,8 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Blog from "./pages/Blog";
 import BlogPublic from "./pages/BlogPublic";
+import BlogPost from "./pages/BlogPost";
+import BlogEditor from "./pages/BlogEditor";
 import Services from "./pages/services";
 import ServicePage from "./pages/services/[slug]";
 import Login from "./pages/Login";
@@ -36,13 +38,16 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/blog" element={<BlogPublic />} />
+              <Route path="/blog/:id" element={<BlogPost />} />
               <Route path="/admin/blog-editor" element={<Blog />} />
-              <Route path="/blog/public" element={<BlogPublic />} />
               <Route path="/services" element={<Services />} />
               <Route path="/services/:slug" element={<ServicePage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/blog" element={<BlogManagement />} />
+              <Route path="/admin/blog/new" element={<BlogEditor />} />
+              <Route path="/admin/blog/edit/:id" element={<BlogEditor />} />
               <Route path="/admin/contacts" element={<ContactManagement />} />
               <Route path="/admin/newsletter" element={<NewsletterManagement />} />
               <Route path="*" element={<NotFound />} />
