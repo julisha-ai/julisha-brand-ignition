@@ -93,7 +93,7 @@ export default function Admin() {
               <p className="text-muted-foreground mb-4">
                 Create, edit, and manage blog posts
               </p>
-              <Button className="w-full" onClick={() => navigate("/admin/blog-editor")}>
+              <Button className="w-full" onClick={() => navigate("/admin/blog")}>
                 Manage Posts
               </Button>
             </CardContent>
