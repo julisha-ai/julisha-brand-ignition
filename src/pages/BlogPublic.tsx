@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { Calendar, User, ArrowLeft, Edit } from "lucide-react";
+import { Calendar, User, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,10 +19,6 @@ interface BlogPost {
 const BlogPublic = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editContent, setEditContent] = useState("");
-  const [editExcerpt, setEditExcerpt] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -58,59 +54,6 @@ const BlogPublic = () => {
     }
   };
 
-  const handleEdit = (post: BlogPost) => {
-    setEditingPost(post);
-    setEditTitle(post.title);
-    setEditContent(post.content);
-    setEditExcerpt(post.excerpt || "");
-  };
-
-  const handleSave = async () => {
-    if (!editingPost) return;
-
-    try {
-      const { error } = await supabase
-        .from('blog_posts')
-        .update({
-          title: editTitle,
-          content: editContent,
-          excerpt: editExcerpt,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', editingPost.id);
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to update post",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      toast({
-        title: "Success",
-        description: "Post updated successfully",
-      });
-
-      setEditingPost(null);
-      fetchPublishedPosts();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleCancel = () => {
-    setEditingPost(null);
-    setEditTitle("");
-    setEditContent("");
-    setEditExcerpt("");
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -133,12 +76,12 @@ const BlogPublic = () => {
             </p>
           </div>
 
-          {/* Back to Admin */}
-          <div className="mb-8">
+          {/* Admin Access */}
+          <div className="mb-8 flex justify-end">
             <Button asChild variant="outline">
               <Link to="/admin/blog">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Admin
+                Admin Dashboard
               </Link>
             </Button>
           </div>
@@ -149,91 +92,49 @@ const BlogPublic = () => {
               <article key={post.id} className="border-b border-border pb-8 last:border-b-0">
                 <Card className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-8">
-                    {editingPost?.id === post.id ? (
-                      // Edit Mode
-                      <div className="space-y-4">
-                        <input
-                          type="text"
-                          value={editTitle}
-                          onChange={(e) => setEditTitle(e.target.value)}
-                          className="w-full text-2xl md:text-3xl font-bold bg-transparent border-b border-border focus:border-[#FFD700] outline-none"
-                          placeholder="Post title..."
-                        />
-                        
-                        <input
-                          type="text"
-                          value={editExcerpt}
-                          onChange={(e) => setEditExcerpt(e.target.value)}
-                          className="w-full text-sm bg-transparent border-b border-border focus:border-[#FFD700] outline-none"
-                          placeholder="Post excerpt..."
-                        />
-                        
-                        <textarea
-                          value={editContent}
-                          onChange={(e) => setEditContent(e.target.value)}
-                          className="w-full h-48 text-lg bg-transparent border border-border rounded focus:border-[#FFD700] outline-none p-4 resize-none"
-                          placeholder="Post content..."
-                        />
-                        
-                        <div className="flex gap-4">
-                          <Button onClick={handleSave} className="bg-[#FFD700] hover:bg-[#FFE44D] text-black">
-                            Save Changes
-                          </Button>
-                          <Button onClick={handleCancel} variant="outline">
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      // View Mode
-                      <>
-                        <div className="flex justify-between items-start mb-4">
-                          <h2 className="text-2xl md:text-3xl font-bold text-foreground hover:text-[#FFD700] transition-colors">
-                            {post.title}
-                          </h2>
-                          <Button
-                            onClick={() => handleEdit(post)}
-                            variant="outline"
-                            size="sm"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        
-                        <div className="flex items-center gap-6 text-sm text-muted-foreground mb-6">
-                          <span className="flex items-center gap-2">
-                            <User className="w-4 h-4" />
-                            Author
-                          </span>
-                          <span className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4" />
-                            {new Date(post.created_at).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </span>
-                        </div>
+                    <Link to={`/blog/${post.id}`} className="block group">
+                      <h2 className="text-2xl md:text-3xl font-bold text-foreground hover:text-[#FFD700] transition-colors mb-4">
+                        {post.title}
+                      </h2>
+                    </Link>
+                    
+                    <div className="flex items-center gap-6 text-sm text-muted-foreground mb-6">
+                      <span className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        {(post as any).author_name || "Julisha Solutions"}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        {new Date(post.created_at).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
 
-                        {post.excerpt && (
-                          <p className="text-lg text-muted-foreground mb-4 italic">
-                            {post.excerpt}
-                          </p>
-                        )}
-
-                        <p className="text-lg text-muted-foreground mb-6 leading-relaxed whitespace-pre-wrap">
-                          {post.content}
-                        </p>
-
-                        <div className="flex gap-4">
-                          <Button variant="outline" asChild>
-                            <Link to="/contact">
-                              Contact Us
-                            </Link>
-                          </Button>
-                        </div>
-                      </>
+                    {post.excerpt && (
+                      <p className="text-lg text-muted-foreground mb-4 italic">
+                        {post.excerpt}
+                      </p>
                     )}
+
+                    <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-3">
+                      {post.content.substring(0, 200)}...
+                    </p>
+
+                    <div className="flex gap-4">
+                      <Button asChild>
+                        <Link to={`/blog/${post.id}`}>
+                          Read More
+                        </Link>
+                      </Button>
+                      <Button variant="outline" asChild>
+                        <Link to="/contact">
+                          Contact Us
+                        </Link>
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </article>
@@ -251,7 +152,7 @@ const BlogPublic = () => {
                 </p>
                 <Button asChild className="bg-[#FFD700] hover:bg-[#FFE44D] text-black">
                   <Link to="/admin/blog">
-                    Go to Admin
+                    Admin Dashboard
                   </Link>
                 </Button>
               </CardContent>

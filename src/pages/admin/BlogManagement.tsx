@@ -154,7 +154,7 @@ export default function BlogManagement() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => navigate(`/blog/${post.id}`)}
+                        onClick={() => post.published ? navigate(`/blog/${post.id}`) : navigate(`/admin/blog/edit/${post.id}`)}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>

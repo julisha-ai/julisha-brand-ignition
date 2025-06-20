@@ -72,7 +72,7 @@ export default function BlogEditor() {
         content: data.content,
         excerpt: data.excerpt || "",
         published: data.published || false,
-        author_name: data.author_name || "Julisha Solutions"
+        author_name: (data as any).author_name || "Julisha Solutions"
       });
     } catch (error) {
       toast({

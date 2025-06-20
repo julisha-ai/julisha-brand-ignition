@@ -168,7 +168,7 @@ export default function BlogPost() {
                   <div className="flex items-center gap-6 text-sm text-muted-foreground mb-6">
                     <span className="flex items-center gap-2">
                       <User className="w-4 h-4" />
-                      {post.author_name || "Julisha Solutions"}
+                      {(post as any).author_name || "Julisha Solutions"}
                     </span>
                     <span className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
