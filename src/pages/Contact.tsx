@@ -262,7 +262,7 @@ const Contact = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold mb-1">Email Us</h3>
-                        <p className="text-gray-300">hello@julishasolutions.com</p>
+                        <p className="text-gray-300">julishasolutions@gmail.com</p>
                         <p className="text-gray-300">support@julishasolutions.com</p>
                       </div>
                     </div>
@@ -273,7 +273,7 @@ const Contact = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold mb-1">Call Us</h3>
-                        <p className="text-gray-300">+1 (555) 123-4567</p>
+                        <p className="text-gray-300">+254 (797) 886-393</p>
                         <p className="text-sm text-gray-400">Mon-Fri 9AM-6PM EST</p>
                       </div>
                     </div>
