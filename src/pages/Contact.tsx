@@ -284,7 +284,7 @@ const Contact = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold mb-1">Location</h3>
-                        <p className="text-gray-300">New York, NY</p>
+                        <p className="text-gray-300">Nairobi, KE</p>
                         <p className="text-sm text-gray-400">Remote & On-site Services</p>
                       </div>
                     </div>
