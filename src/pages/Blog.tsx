@@ -1,22 +1,17 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
-import { 
-  PlusCircle, 
-  Edit, 
-  Trash2, 
-  Calendar, 
-  User, 
-  Eye,
-  Webhook,
-  Settings
-} from "lucide-react";
+import { PlusCircle, Eye } from "lucide-react";
+
+import { BlogHeader } from "@/components/blog/BlogHeader";
+import { WebhookConfiguration } from "@/components/blog/WebhookConfiguration";
+import { PostEditor } from "@/components/blog/PostEditor";
+import { PostCard } from "@/components/blog/PostCard";
 
 interface BlogPost {
   id: string;
@@ -171,8 +166,6 @@ const Blog = () => {
         }
       };
 
-      console.log("Triggering webhook with payload:", webhookPayload);
-
       await fetch(webhookUrl, {
         method: "POST",
         headers: {
@@ -226,13 +219,8 @@ const Blog = () => {
     }
   };
 
-  const generateWebhookUrl = () => {
-    const baseUrl = window.location.origin;
-    return `https://vqkzyzlyrkxatgdqjczz.supabase.co/functions/v1/blog-webhook`;
-  };
-
   const testWebhook = async () => {
-    const webhookUrl = generateWebhookUrl();
+    const webhookUrl = `https://vqkzyzlyrkxatgdqjczz.supabase.co/functions/v1/blog-webhook`;
     const testPayload = {
       title: "Test Blog Post from Automation",
       content: "This is a test blog post created via webhook to verify the incoming webhook functionality is working correctly.",
@@ -254,7 +242,7 @@ const Blog = () => {
           title: "Test Successful",
           description: "Webhook test completed successfully! Check for the new test post.",
         });
-        await fetchPosts(); // Refresh the posts to show the new test post
+        await fetchPosts();
       } else {
         toast({
           title: "Test Failed",
@@ -279,225 +267,42 @@ const Blog = () => {
     );
   }
 
+  const filteredPosts = posts.filter(post => showPublishedOnly ? post.published : true);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-foreground mb-2">Blog Management</h1>
-              <p className="text-muted-foreground">Create and manage your blog content with automation support</p>
-            </div>
-            <div className="flex gap-2">
-              <Button 
-                variant={showPublishedOnly ? "default" : "outline"}
-                onClick={() => setShowPublishedOnly(!showPublishedOnly)}
-                className={showPublishedOnly ? "bg-green-600 hover:bg-green-700 text-white" : ""}
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                {showPublishedOnly ? "Show All Posts" : "Published Only"}
-              </Button>
-              <Button 
-                onClick={() => setShowEditor(!showEditor)}
-                className="bg-[#FFD700] hover:bg-[#FFE44D] text-black"
-              >
-                <PlusCircle className="w-4 h-4 mr-2" />
-                New Post
-              </Button>
-            </div>
-          </div>
+          <BlogHeader 
+            showPublishedOnly={showPublishedOnly}
+            setShowPublishedOnly={setShowPublishedOnly}
+            onNewPost={() => setShowEditor(!showEditor)}
+          />
 
-          {/* Webhook Configuration */}
-          <div className="grid gap-6 mb-8 md:grid-cols-2">
-            {/* Outgoing Webhook */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Webhook className="w-5 h-5" />
-                  Outgoing Webhook
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <Input
-                    placeholder="Enter your webhook URL (e.g., https://hook.make.com/...)"
-                    value={webhookUrl}
-                    onChange={(e) => setWebhookUrl(e.target.value)}
-                  />
-                  <Button 
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      if (webhookUrl) {
-                        toast({
-                          title: "Webhook Saved",
-                          description: "Automation will be triggered for published posts",
-                        });
-                      }
-                    }}
-                    className="w-full"
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Save Outgoing URL
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    Triggers when you publish posts manually
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+          <WebhookConfiguration
+            webhookUrl={webhookUrl}
+            setWebhookUrl={setWebhookUrl}
+            incomingWebhookUrl={incomingWebhookUrl}
+            setIncomingWebhookUrl={setIncomingWebhookUrl}
+            onTestWebhook={testWebhook}
+          />
 
-            {/* Incoming Webhook */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Webhook className="w-5 h-5 rotate-180" />
-                  Incoming Webhook
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="p-3 bg-gray-50 rounded border text-sm font-mono break-all">
-                    {incomingWebhookUrl || "Click generate to create URL"}
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      const url = generateWebhookUrl();
-                      setIncomingWebhookUrl(url);
-                      navigator.clipboard.writeText(url);
-                      toast({
-                        title: "Webhook URL Generated",
-                        description: "URL copied to clipboard! Use this in Make.com/n8n to POST blog posts here.",
-                      });
-                    }}
-                    className="w-full"
-                  >
-                    <PlusCircle className="w-4 h-4 mr-2" />
-                    Generate & Copy URL
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={testWebhook}
-                    className="w-full"
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    Test Incoming Webhook
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    Use this URL in Make.com/n8n to automatically post blogs here
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Post Editor */}
           {showEditor && (
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Create New Post</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Input
-                  placeholder="Post Title"
-                  value={currentPost.title}
-                  onChange={(e) => setCurrentPost({...currentPost, title: e.target.value})}
-                />
-                <Textarea
-                  placeholder="Excerpt (optional)"
-                  value={currentPost.excerpt}
-                  onChange={(e) => setCurrentPost({...currentPost, excerpt: e.target.value})}
-                  rows={2}
-                />
-                <Textarea
-                  placeholder="Write your blog content here..."
-                  value={currentPost.content}
-                  onChange={(e) => setCurrentPost({...currentPost, content: e.target.value})}
-                  rows={8}
-                />
-                <div className="flex gap-2 justify-between">
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => handleSavePost(false)}
-                    >
-                      Save as Draft
-                    </Button>
-                    <Button
-                      onClick={() => handleSavePost(true)}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      Publish Now
-                    </Button>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => setShowEditor(false)}>
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <PostEditor
+              currentPost={currentPost}
+              setCurrentPost={setCurrentPost}
+              onSave={handleSavePost}
+              onCancel={() => setShowEditor(false)}
+            />
           )}
 
-          {/* Blog Posts Grid */}
           <div className="grid gap-6">
-            {posts
-              .filter(post => showPublishedOnly ? post.published : true)
-              .map((post) => (
-              <Card key={post.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-xl font-semibold text-foreground">{post.title}</h3>
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          post.published 
-                            ? "bg-green-100 text-green-800" 
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}>
-                          {post.published ? "Published" : "Draft"}
-                        </span>
-                      </div>
-                      <p className="text-muted-foreground mb-4">{post.excerpt}</p>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <User className="w-4 h-4" />
-                          {post.author_id ? "Admin" : "System"}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {new Date(post.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex gap-2 ml-4">
-                      <Button variant="outline" size="sm">
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => deletePost(post.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            {filteredPosts.map((post) => (
+              <PostCard key={post.id} post={post} onDelete={deletePost} />
             ))}
           </div>
 
-          {posts.filter(post => showPublishedOnly ? post.published : true).length === 0 && (
+          {filteredPosts.length === 0 && (
             <Card className="text-center py-12">
               <CardContent>
                 <PlusCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -520,7 +325,6 @@ const Blog = () => {
             </Card>
           )}
 
-          {/* Public Blog Link */}
           <Card className="mt-8 bg-gradient-to-r from-primary/5 to-[#FFD700]/5">
             <CardContent className="p-6 text-center">
               <h3 className="text-lg font-semibold text-foreground mb-2">Public Blog</h3>
