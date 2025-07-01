@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Calendar, User, ArrowLeft } from "lucide-react";
@@ -54,6 +55,11 @@ const BlogPublic = () => {
     }
   };
 
+  const extractFirstImage = (content: string) => {
+    const imageMatch = content.match(/\[IMAGE:([^\]]+)\]/);
+    return imageMatch ? imageMatch[1] : null;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -76,69 +82,74 @@ const BlogPublic = () => {
             </p>
           </div>
 
-          {/* Admin Access */}
-          <div className="mb-8 flex justify-end">
-            <Button asChild variant="outline">
-              <Link to="/admin/blog">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Admin Dashboard
-              </Link>
-            </Button>
-          </div>
-
           {/* Blog Posts */}
           <div className="space-y-8">
-            {posts.map((post) => (
-              <article key={post.id} className="border-b border-border pb-8 last:border-b-0">
-                <Card className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-8">
-                    <Link to={`/blog/${post.id}`} className="block group">
-                      <h2 className="text-2xl md:text-3xl font-bold text-foreground hover:text-[#FFD700] transition-colors mb-4">
-                        {post.title}
-                      </h2>
-                    </Link>
-                    
-                    <div className="flex items-center gap-6 text-sm text-muted-foreground mb-6">
-                      <span className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        {(post as any).author_name || "Julisha Solutions"}
-                      </span>
-                      <span className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(post.created_at).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </span>
-                    </div>
-
-                    {post.excerpt && (
-                      <p className="text-lg text-muted-foreground mb-4 italic">
-                        {post.excerpt}
-                      </p>
-                    )}
-
-                    <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-3">
-                      {post.content.substring(0, 200)}...
-                    </p>
-
-                    <div className="flex gap-4">
-                      <Button asChild>
-                        <Link to={`/blog/${post.id}`}>
-                          Read More
+            {posts.map((post) => {
+              const coverImage = extractFirstImage(post.content);
+              return (
+                <article key={post.id} className="border-b border-border pb-8 last:border-b-0">
+                  <Card className="hover:shadow-lg transition-shadow overflow-hidden">
+                    <CardContent className="p-0">
+                      {coverImage && (
+                        <div className="aspect-video w-full overflow-hidden">
+                          <img 
+                            src={coverImage} 
+                            alt={post.title}
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+                      
+                      <div className="p-8">
+                        <Link to={`/blog/${post.id}`} className="block group">
+                          <h2 className="text-2xl md:text-3xl font-bold text-foreground hover:text-[#FFD700] transition-colors mb-4">
+                            {post.title}
+                          </h2>
                         </Link>
-                      </Button>
-                      <Button variant="outline" asChild>
-                        <Link to="/contact">
-                          Contact Us
-                        </Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </article>
-            ))}
+                        
+                        <div className="flex items-center gap-6 text-sm text-muted-foreground mb-6">
+                          <span className="flex items-center gap-2">
+                            <User className="w-4 h-4" />
+                            {(post as any).author_name || "Julisha Solutions"}
+                          </span>
+                          <span className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            {new Date(post.created_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </span>
+                        </div>
+
+                        {post.excerpt && (
+                          <p className="text-lg text-muted-foreground mb-4 italic">
+                            {post.excerpt}
+                          </p>
+                        )}
+
+                        <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-3">
+                          {post.content.replace(/\[IMAGE:[^\]]+\]/g, '').substring(0, 200)}...
+                        </p>
+
+                        <div className="flex gap-4">
+                          <Button asChild>
+                            <Link to={`/blog/${post.id}`}>
+                              Read More
+                            </Link>
+                          </Button>
+                          <Button variant="outline" asChild>
+                            <Link to="/contact">
+                              Contact Us
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </article>
+              );
+            })}
           </div>
 
           {posts.length === 0 && (
@@ -150,11 +161,6 @@ const BlogPublic = () => {
                 <p className="text-muted-foreground mb-8">
                   There are no published blog posts to display at the moment.
                 </p>
-                <Button asChild className="bg-[#FFD700] hover:bg-[#FFE44D] text-black">
-                  <Link to="/admin/blog">
-                    Admin Dashboard
-                  </Link>
-                </Button>
               </CardContent>
             </Card>
           )}

@@ -1,3 +1,4 @@
+
 import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
 import { Link } from "react-router-dom";
 import { services } from "@/lib/services";
@@ -11,6 +12,7 @@ const footerLinks = [
       { name: "Contact", href: "/contact" },
       { name: "Privacy Policy", href: "/privacy" },
       { name: "Terms of Service", href: "/terms" },
+      { name: "Admin Dashboard", href: "/login" },
     ],
   }
 ];

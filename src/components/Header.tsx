@@ -1,3 +1,4 @@
+
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -43,13 +44,13 @@ export default function Header() {
               </Link>
             ))}
 
-            <NavigationMenu className="!z-[9999]">
+            <NavigationMenu className="relative z-50">
               <NavigationMenuList>
                 <NavigationMenuItem>
                   <NavigationMenuTrigger className="text-white hover:text-[#FFD700] transition-colors text-sm lg:text-base bg-transparent hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent data-[state=open]:text-[#FFD700]">
                     Our Services
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className="!bg-black !border !border-gray-700 !shadow-xl min-w-[400px] !z-[9999] !relative">
+                  <NavigationMenuContent className="!bg-black !border !border-gray-700 !shadow-xl min-w-[400px] !z-50 !absolute">
                     <ul className="grid w-[400px] gap-1 p-4 text-white">
                       {services.map((service) => (
                         <li key={service.slug}>
@@ -81,14 +82,6 @@ export default function Header() {
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="border-[#FFD700] text-[#FFD700] hover:bg-[#FFD700] hover:text-black"
-            >
-              <Link to="/login">Admin</Link>
-            </Button>
             <Button
               asChild
               size="lg"
