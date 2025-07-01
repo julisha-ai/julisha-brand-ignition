@@ -100,7 +100,7 @@ export function RichTextEditor({ value, onChange, placeholder, rows = 20 }: Rich
       
       <div className="text-xs text-muted-foreground space-y-1">
         <p><strong>Formatting Guide:</strong></p>
-        <p>• **bold** *italic* __underline__ `code` > quote</p>
+        <p>• **bold** *italic* __underline__ `code` {`>`} quote</p>
         <p>• # H1, ## H2, ### H3 for headings</p>
         <p>• [link text](url) for links</p>
         <p>• [IMAGE:url] for images</p>
