@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { RichTextEditor } from "./RichTextEditor";
 
 interface PostEditorProps {
   currentPost: {
@@ -28,18 +29,23 @@ export function PostEditor({ currentPost, setCurrentPost, onSave, onCancel }: Po
           value={currentPost.title}
           onChange={(e) => setCurrentPost({...currentPost, title: e.target.value})}
         />
-        <Textarea
-          placeholder="Excerpt (optional)"
-          value={currentPost.excerpt}
-          onChange={(e) => setCurrentPost({...currentPost, excerpt: e.target.value})}
-          rows={2}
-        />
-        <Textarea
-          placeholder="Write your blog content here..."
-          value={currentPost.content}
-          onChange={(e) => setCurrentPost({...currentPost, content: e.target.value})}
-          rows={8}
-        />
+        <div>
+          <label className="text-sm font-medium mb-2 block">Excerpt (optional)</label>
+          <Textarea
+            placeholder="Brief description of the post..."
+            value={currentPost.excerpt}
+            onChange={(e) => setCurrentPost({...currentPost, excerpt: e.target.value})}
+            rows={2}
+          />
+        </div>
+        <div>
+          <label className="text-sm font-medium mb-2 block">Content</label>
+          <RichTextEditor
+            value={currentPost.content}
+            onChange={(content) => setCurrentPost({...currentPost, content})}
+            placeholder="Write your blog content here... Use the formatting buttons above for styling."
+          />
+        </div>
         <div className="flex gap-2 justify-between">
           <div className="flex gap-2">
             <Button

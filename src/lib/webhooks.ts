@@ -1,3 +1,4 @@
+
 // Webhook handling service for blog posts
 export interface WebhookBlogPost {
   title?: string;
@@ -11,6 +12,7 @@ export interface WebhookBlogPost {
   seoTitle?: string;
   seoDescription?: string;
   featuredImage?: string;
+  formattedContent?: string; // New field for pre-formatted content
 }
 
 export interface ProcessedBlogPost {
@@ -68,11 +70,14 @@ export const validateWebhookData = (data: any): { isValid: boolean; errors: stri
   }
 
   // Process and normalize the data
+  // Use formattedContent if provided, otherwise use regular content
+  const content = data.formattedContent || data.content;
+  
   const processedData: ProcessedBlogPost = {
     id: Date.now().toString(),
     title: data.title.trim(),
-    content: data.content.trim(),
-    excerpt: data.excerpt?.trim() || data.content.substring(0, 150).trim() + "...",
+    content: content.trim(),
+    excerpt: data.excerpt?.trim() || content.substring(0, 150).trim() + "...",
     author: data.author?.trim() || "Automation",
     publishedAt: data.publishedAt || new Date().toISOString().split('T')[0],
     status: data.status || "published",
@@ -117,13 +122,42 @@ export const extractWebhookId = (url: string): string | null => {
   }
 };
 
-// Create a test webhook payload
+// Create a test webhook payload with formatting examples
 export const createTestPayload = (): WebhookBlogPost => ({
   title: "Test Post from Make.com Automation",
-  content: "This is a test blog post created via Make.com automation. It demonstrates how external systems can automatically post content to your blog. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-  excerpt: "A test post demonstrating automated blog posting capabilities",
+  content: `# Welcome to Automated Content Creation
+
+This is a **test blog post** created via *Make.com automation*. It demonstrates how external systems can automatically post content to your blog with rich formatting.
+
+## Key Features
+
+- **Bold text** for emphasis
+- *Italic text* for subtle highlights  
+- __Underlined text__ for important points
+- \`Code snippets\` for technical content
+
+### Formatting Examples
+
+> This is a blockquote that stands out from regular content.
+
+Here's a numbered list:
+1. First automated feature
+2. Second automated feature  
+3. Third automated feature
+
+And a bullet list:
+- Easy integration
+- Rich text support
+- Image embedding
+- SEO optimization
+
+[IMAGE:https://images.unsplash.com/photo-1488590528505-98d2b5aba04b]
+
+**Make.com Integration Benefits:**
+The integration allows you to automatically create formatted blog posts from various data sources while maintaining consistent styling and professional presentation.`,
+  excerpt: "A test post demonstrating automated blog posting capabilities with rich text formatting",
   author: "Make.com Bot",
-  tags: ["automation", "test", "make.com", "webhook"],
+  tags: ["automation", "test", "make.com", "webhook", "formatting"],
   category: "Technology",
   status: "published"
 });

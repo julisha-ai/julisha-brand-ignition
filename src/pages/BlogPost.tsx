@@ -1,9 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { BlogContentRenderer } from "@/components/blog/BlogContentRenderer";
 import { 
   Calendar, 
   User, 
@@ -187,10 +189,9 @@ export default function BlogPost() {
                   )}
                 </header>
 
-                <div className="prose prose-lg max-w-none mb-8">
-                  <div className="text-foreground leading-relaxed whitespace-pre-wrap">
-                    {post.content}
-                  </div>
+                {/* Rendered Blog Content with Ads */}
+                <div className="mb-8">
+                  <BlogContentRenderer content={post.content} showAds={true} />
                 </div>
 
                 {/* Engagement Section */}

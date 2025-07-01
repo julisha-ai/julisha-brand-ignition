@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { RichTextEditor } from "@/components/blog/RichTextEditor";
 import { ArrowLeft, Save, Eye, Trash2, Upload } from "lucide-react";
 
 interface BlogPost {
@@ -275,29 +276,14 @@ export default function BlogEditor() {
                 />
               </div>
 
-              {/* Content */}
+              {/* Content with Rich Text Editor */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium">Content *</label>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleImageUpload}
-                  >
-                    <Upload className="h-4 w-4 mr-2" />
-                    Add Media
-                  </Button>
-                </div>
-                <Textarea
-                  placeholder="Write your blog content here..."
+                <label className="text-sm font-medium mb-2 block">Content *</label>
+                <RichTextEditor
                   value={post.content}
-                  onChange={(e) => setPost({...post, content: e.target.value})}
-                  rows={20}
-                  className="font-mono"
+                  onChange={(content) => setPost({...post, content})}
+                  placeholder="Write your blog content here... Use the formatting toolbar for styling and images."
                 />
-                <p className="text-xs text-muted-foreground mt-2">
-                  Tip: Use line breaks to separate paragraphs. Media upload feature coming soon!
-                </p>
               </div>
 
               {/* Actions */}
