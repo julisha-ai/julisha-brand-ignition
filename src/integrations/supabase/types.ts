@@ -87,6 +87,60 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          additional_info: string | null
+          budget_range: string | null
+          business_size: string | null
+          company: string | null
+          created_at: string
+          current_challenges: string | null
+          email: string
+          goals: string | null
+          id: string
+          industry: string | null
+          name: string
+          phone: string | null
+          recommendations: string | null
+          timeline: string | null
+          updated_at: string
+        }
+        Insert: {
+          additional_info?: string | null
+          budget_range?: string | null
+          business_size?: string | null
+          company?: string | null
+          created_at?: string
+          current_challenges?: string | null
+          email: string
+          goals?: string | null
+          id?: string
+          industry?: string | null
+          name: string
+          phone?: string | null
+          recommendations?: string | null
+          timeline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          additional_info?: string | null
+          budget_range?: string | null
+          business_size?: string | null
+          company?: string | null
+          created_at?: string
+          current_challenges?: string | null
+          email?: string
+          goals?: string | null
+          id?: string
+          industry?: string | null
+          name?: string
+          phone?: string | null
+          recommendations?: string | null
+          timeline?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string

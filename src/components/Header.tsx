@@ -14,6 +14,7 @@ import { services } from "@/lib/services";
 const navigation = [
   { name: "Home", href: "/" },
   { name: "About", href: "/about" },
+  { name: "AI Recommendations", href: "/service-recommendations" },
   { name: "Blog", href: "/blog" },
   { name: "Contact", href: "/contact" },
 ];
