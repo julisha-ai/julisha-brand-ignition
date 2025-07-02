@@ -11,6 +11,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
 
+const formatRecommendations = (text: string) => {
+  if (!text) return "";
+  
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/###\s*(.*)/g, '<h3 class="text-lg font-semibold mt-4 mb-2 text-primary">$1</h3>')
+    .replace(/##\s*(.*)/g, '<h2 class="text-xl font-bold mt-6 mb-3 text-primary">$1</h2>')
+    .replace(/#\s*(.*)/g, '<h1 class="text-2xl font-bold mt-8 mb-4 text-primary">$1</h1>')
+    .replace(/\n\n/g, '</p><p class="mb-3">')
+    .replace(/\n/g, '<br/>')
+    .replace(/^(.*)/, '<p class="mb-3">$1</p>');
+};
+
 const ServiceRecommendations = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(false);
@@ -94,11 +108,12 @@ const ServiceRecommendations = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-gray max-w-none">
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                    {recommendations}
-                  </div>
-                </div>
+                <div 
+                  className="prose prose-sm max-w-none text-sm leading-relaxed"
+                  dangerouslySetInnerHTML={{ 
+                    __html: formatRecommendations(recommendations) 
+                  }}
+                />
               </CardContent>
             </Card>
 

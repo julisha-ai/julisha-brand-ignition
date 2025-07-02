@@ -21,6 +21,7 @@ import Admin from "./pages/Admin";
 import BlogManagement from "./pages/admin/BlogManagement";
 import ContactManagement from "./pages/admin/ContactManagement";
 import NewsletterManagement from "./pages/admin/NewsletterManagement";
+import LeadsManagement from "./pages/admin/LeadsManagement";
 import NotFound from "./pages/NotFound";
 import ServiceRecommendations from "./pages/ServiceRecommendations";
 
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="/admin/blog/edit/:id" element={<BlogEditor />} />
               <Route path="/admin/contacts" element={<ContactManagement />} />
               <Route path="/admin/newsletter" element={<NewsletterManagement />} />
+              <Route path="/admin/leads" element={<LeadsManagement />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>
