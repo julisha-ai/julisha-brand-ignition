@@ -23,7 +23,7 @@ import ContactManagement from "./pages/admin/ContactManagement";
 import NewsletterManagement from "./pages/admin/NewsletterManagement";
 import LeadsManagement from "./pages/admin/LeadsManagement";
 import NotFound from "./pages/NotFound";
-import BrandWise from "./pages/BrandWise";
+import BrandWise from "./pages/ServiceRecommendations";
 
 const queryClient = new QueryClient();
 

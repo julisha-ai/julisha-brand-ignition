@@ -1,34 +1,17 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Brain, Target, TrendingUp, Zap, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader2, Save, Copy, Download, Star, Zap, Users, TrendingUp, Target, Megaphone, Brain, CheckCircle, ArrowRight } from "lucide-react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
 
-const formatRecommendations = (text: string) => {
-  if (!text) return "";
-  
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/###\s*(.*)/g, '<h3 class="text-lg font-semibold mt-4 mb-2 text-primary">$1</h3>')
-    .replace(/##\s*(.*)/g, '<h2 class="text-xl font-bold mt-6 mb-3 text-primary">$1</h2>')
-    .replace(/#\s*(.*)/g, '<h1 class="text-2xl font-bold mt-8 mb-4 text-primary">$1</h1>')
-    .replace(/\n\n/g, '</p><p class="mb-3">')
-    .replace(/\n/g, '<br/>')
-    .replace(/^(.*)/, '<p class="mb-3">$1</p>');
-};
-
-const ServiceRecommendations = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [showRecommendations, setShowRecommendations] = useState(false);
-  const [recommendations, setRecommendations] = useState("");
+const BrandWise = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -42,6 +25,10 @@ const ServiceRecommendations = () => {
     timeline: "",
     additionalInfo: ""
   });
+  const [recommendations, setRecommendations] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSaveOptions, setShowSaveOptions] = useState(false);
+  const [showProModal, setShowProModal] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -65,157 +52,133 @@ const ServiceRecommendations = () => {
       if (error) throw error;
 
       setRecommendations(data.recommendations);
-      setShowRecommendations(true);
-      toast.success("Recommendations generated successfully!");
+      toast.success("BrandWise recommendations generated successfully!");
+      setShowSaveOptions(true);
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       toast.error("Failed to generate recommendations. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (showRecommendations) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
-        <SEO
-          title="Your AI-Powered Service Recommendations - Julisha Solutions"
-          description="Personalized AI and brand management service recommendations tailored to your business needs"
-          url="/service-recommendations"
-        />
-        
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-8">
-              <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-                <Brain className="w-4 h-4 mr-2" />
-                AI-Powered Analysis Complete
-              </Badge>
-              <h1 className="text-4xl font-bold mb-4">Your Personalized Recommendations</h1>
-              <p className="text-muted-foreground text-lg">
-                Based on your business profile and current market trends
-              </p>
-            </div>
+  const handleCopyRecommendations = () => {
+    navigator.clipboard.writeText(recommendations);
+    toast.success("Recommendations copied to clipboard!");
+  };
 
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-primary" />
-                  Strategic Business Recommendations
-                </CardTitle>
-                <CardDescription>
-                  Tailored insights for {formData.company || formData.name}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div 
-                  className="prose prose-sm max-w-none text-sm leading-relaxed"
-                  dangerouslySetInnerHTML={{ 
-                    __html: formatRecommendations(recommendations) 
-                  }}
-                />
-              </CardContent>
-            </Card>
+  const handleDownloadRecommendations = () => {
+    const element = document.createElement("a");
+    const file = new Blob([recommendations], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = "brandwise-recommendations.txt";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    toast.success("Recommendations downloaded!");
+  };
 
-            {/* Ad Space */}
-            <Card className="mb-8 border-dashed border-2 border-primary/20 bg-primary/5">
-              <CardContent className="py-8 text-center">
-                <Badge variant="outline" className="mb-2">Sponsored</Badge>
-                <h3 className="text-lg font-semibold mb-2">Ready to Transform Your Business?</h3>
-                <p className="text-muted-foreground mb-4">
-                  Get started with Julisha Solutions' AI-powered services today
-                </p>
-                <Button className="bg-primary hover:bg-primary/90">
-                  Schedule Free Consultation
-                </Button>
-              </CardContent>
-            </Card>
+  const handleSaveRecommendations = () => {
+    setShowProModal(true);
+  };
 
-            <div className="text-center">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowRecommendations(false)}
-                className="mr-4"
-              >
-                Generate New Recommendations
-              </Button>
-              <Button onClick={() => window.location.href = '/contact'}>
-                Contact Our Team
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const formatRecommendations = (text: string) => {
+    return text.split('\n').map((line, index) => {
+      // Headers (lines starting with #)
+      if (line.startsWith('# ')) {
+        return <h1 key={index} className="text-2xl font-bold mt-6 mb-3 text-primary">{line.substring(2)}</h1>;
+      }
+      if (line.startsWith('## ')) {
+        return <h2 key={index} className="text-xl font-semibold mt-4 mb-2 text-primary">{line.substring(3)}</h2>;
+      }
+      if (line.startsWith('### ')) {
+        return <h3 key={index} className="text-lg font-medium mt-3 mb-2 text-foreground">{line.substring(4)}</h3>;
+      }
+      
+      // Bold text
+      if (line.includes('**')) {
+        const parts = line.split('**');
+        return (
+          <p key={index} className="mb-2">
+            {parts.map((part, i) => 
+              i % 2 === 1 ? <strong key={i} className="font-semibold">{part}</strong> : part
+            )}
+          </p>
+        );
+      }
+      
+      // Bullet points
+      if (line.startsWith('- ') || line.startsWith('• ')) {
+        return <li key={index} className="ml-4 mb-1">{line.substring(2)}</li>;
+      }
+      
+      // Empty lines
+      if (line.trim() === '') {
+        return <br key={index} />;
+      }
+      
+      // Regular paragraphs
+      return <p key={index} className="mb-2 leading-relaxed">{line}</p>;
+    });
+  };
+
+  const proAgents = [
+    {
+      name: "Product Market Fit Companion",
+      icon: Target,
+      description: "Deep dive into market validation, customer discovery, and product positioning strategies",
+      specialization: "Market Research & Product Strategy",
+      features: ["Market analysis", "Customer interviews", "Product-market fit assessment", "Positioning strategy"]
+    },
+    {
+      name: "Strategy Companion", 
+      icon: TrendingUp,
+      description: "Comprehensive business strategy, competitive analysis, and sustainable growth planning",
+      specialization: "Strategic Planning & Business Development",
+      features: ["Strategic planning", "Competitive analysis", "Growth strategies", "Business model optimization"]
+    },
+    {
+      name: "Marketing Companion",
+      icon: Megaphone,
+      description: "Digital marketing strategies, brand development, and customer acquisition optimization",
+      specialization: "Marketing & Brand Development",
+      features: ["Digital marketing", "Brand positioning", "Customer acquisition", "Campaign optimization"]
+    },
+    {
+      name: "Team Building Companion",
+      icon: Users,
+      description: "Organizational design, hiring strategies, and team performance optimization",
+      specialization: "Human Resources & Team Development",
+      features: ["Organizational design", "Hiring strategies", "Team optimization", "Performance management"]
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
       <SEO
-        title="AI Service Recommendations - Julisha Solutions"
-        description="Get personalized AI and brand management service recommendations based on your business needs and current market trends"
+        title="BrandWise - AI-Powered Business Intelligence - Julisha Solutions"
+        description="Get personalized business recommendations and access specialized AI companions with BrandWise Pro"
         url="/service-recommendations"
       />
       
       <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-              <Brain className="w-4 h-4 mr-2" />
-              AI-Powered Business Consultant
-            </Badge>
-            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              Discover Your Perfect AI Solutions
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Our intelligent assistant analyzes your business needs and current market trends to recommend 
-              the most effective AI and brand management services for your growth.
+        <div className="max-w-4xl mx-auto space-y-8">
+          <div className="text-center space-y-4">
+            <div className="flex items-center justify-center gap-2">
+              <Zap className="h-8 w-8 text-primary" />
+              <span className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">BrandWise</span>
+            </div>
+            <h1 className="text-4xl font-bold">AI-Powered Business Intelligence</h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Get personalized business recommendations powered by advanced AI. Discover insights, strategies, and actionable advice tailored to your unique business needs.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8 mb-12">
-            <Card className="text-center">
-              <CardContent className="pt-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Brain className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-semibold mb-2">AI-Powered Analysis</h3>
-                <p className="text-sm text-muted-foreground">
-                  Advanced algorithms analyze your business profile against current market data
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="text-center">
-              <CardContent className="pt-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-semibold mb-2">Market Insights</h3>
-                <p className="text-sm text-muted-foreground">
-                  Real-time analysis of industry trends and emerging technologies
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="text-center">
-              <CardContent className="pt-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Target className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-semibold mb-2">Strategic Planning</h3>
-                <p className="text-sm text-muted-foreground">
-                  Customized implementation roadmaps and budget optimization
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card className="mb-8">
+          <Card>
             <CardHeader>
-              <CardTitle>Tell Us About Your Business</CardTitle>
+              <CardTitle>Business Intelligence Questionnaire</CardTitle>
               <CardDescription>
-                The more details you provide, the more accurate and valuable our recommendations will be
+                Provide details about your business to unlock personalized BrandWise recommendations and insights.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -366,21 +329,16 @@ const ServiceRecommendations = () => {
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
-                  size="lg" 
-                  className="w-full bg-primary hover:bg-primary/90"
-                  disabled={isLoading}
-                >
+                <Button onClick={handleSubmit} disabled={isLoading} className="w-full">
                   {isLoading ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Analyzing Your Business...
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Generating BrandWise Intelligence...
                     </>
                   ) : (
                     <>
-                      <Zap className="w-4 h-4 mr-2" />
-                      Get My AI Recommendations
+                      <Zap className="mr-2 h-4 w-4" />
+                      Get BrandWise Recommendations
                     </>
                   )}
                 </Button>
@@ -388,21 +346,159 @@ const ServiceRecommendations = () => {
             </CardContent>
           </Card>
 
-          {/* Ad Space */}
-          <Card className="border-dashed border-2 border-primary/20 bg-primary/5">
-            <CardContent className="py-8 text-center">
-              <Badge variant="outline" className="mb-2">Partnership Opportunity</Badge>
-              <h3 className="text-lg font-semibold mb-2">Join Our Partner Network</h3>
-              <p className="text-muted-foreground mb-4">
-                Become a certified Julisha Solutions partner and grow your business with AI
-              </p>
-              <Button variant="outline">Learn More</Button>
-            </CardContent>
-          </Card>
+          {recommendations && (
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Star className="h-5 w-5 text-primary" />
+                      Your BrandWise Recommendations
+                    </CardTitle>
+                    <CardDescription>
+                      AI-powered insights and strategies tailored specifically for your business.
+                    </CardDescription>
+                  </div>
+                  {showSaveOptions && (
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" onClick={handleCopyRecommendations}>
+                        <Copy className="h-4 w-4 mr-1" />
+                        Copy
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={handleDownloadRecommendations}>
+                        <Download className="h-4 w-4 mr-1" />
+                        Download
+                      </Button>
+                      <Button size="sm" onClick={handleSaveRecommendations} className="bg-gradient-to-r from-primary to-primary/80">
+                        <Save className="h-4 w-4 mr-1" />
+                        Save & Unlock Pro
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="prose max-w-none text-foreground">
+                  {formatRecommendations(recommendations)}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Pro Features Modal */}
+          <Dialog open={showProModal} onOpenChange={setShowProModal}>
+            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-2xl">
+                  <Zap className="h-6 w-6 text-primary" />
+                  Unlock BrandWise Pro
+                </DialogTitle>
+                <DialogDescription>
+                  Save your recommendations and access specialized AI business companions for ongoing consultation.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-6">
+                {/* Pro Benefits */}
+                <div className="bg-gradient-to-br from-primary/10 to-secondary/10 p-6 rounded-lg">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    What You Get with BrandWise Pro:
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <ul className="space-y-2">
+                      <li className="flex items-center gap-2">
+                        <Star className="h-4 w-4 text-primary" />
+                        Save and access all your recommendations anytime
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Star className="h-4 w-4 text-primary" />
+                        Access to specialized AI business companions
+                      </li>
+                    </ul>
+                    <ul className="space-y-2">
+                      <li className="flex items-center gap-2">
+                        <Star className="h-4 w-4 text-primary" />
+                        Follow-up consultations at subsidized rates
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Star className="h-4 w-4 text-primary" />
+                        Priority support and expert guidance
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Pro Agents */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-primary" />
+                    Meet Your BrandWise Companions:
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {proAgents.map((agent, index) => (
+                      <Card key={index} className="border-primary/20 hover:shadow-lg transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-3 mb-3">
+                            <agent.icon className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
+                            <div>
+                              <h4 className="font-semibold text-sm">{agent.name}</h4>
+                              <p className="text-xs text-muted-foreground mb-2">{agent.specialization}</p>
+                              <p className="text-sm mb-3">{agent.description}</p>
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-xs font-medium text-muted-foreground">Key Features:</p>
+                            <ul className="text-xs space-y-1">
+                              {agent.features.map((feature, idx) => (
+                                <li key={idx} className="flex items-center gap-1">
+                                  <ArrowRight className="h-3 w-3 text-primary" />
+                                  {feature}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Pricing */}
+                <div className="text-center space-y-4">
+                  <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-6 rounded-lg">
+                    <div className="text-4xl font-bold text-primary mb-2">$29</div>
+                    <div className="text-sm text-muted-foreground mb-1">One-time registration fee</div>
+                    <div className="text-xs text-muted-foreground">
+                      Unlock Pro features + access to specialized companions at subsidized rates
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70" 
+                    size="lg"
+                    onClick={() => window.open('https://payment.intasend.com/pay/46132722-b089-4fdc-a73d-762ebfcb34ab/', '_blank')}
+                  >
+                    <Zap className="mr-2 h-4 w-4" />
+                    Get BrandWise Pro Access Now
+                  </Button>
+                  
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground">
+                      Secure payment powered by IntaSend. Create your account after payment to access Pro features.
+                    </p>
+                    <p className="text-xs text-primary font-medium">
+                      ⚡ Limited Time: Get 50% off your first specialized consultation session
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>
   );
 };
 
-export default ServiceRecommendations;
+export default BrandWise;
