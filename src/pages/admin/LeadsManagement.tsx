@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { User, Search, Eye, Calendar, Building, Mail, Phone, Target, DollarSign, Clock } from "lucide-react";
+import { User, Search, Eye, Calendar, Building, Mail, Phone, Target, DollarSign, Clock, Zap } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface Lead {
@@ -123,7 +123,15 @@ export default function LeadsManagement() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 md:p-6">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          <h1 className="text-2xl md:text-3xl font-bold">Leads Management</h1>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
+              <Zap className="h-6 w-6 text-primary" />
+              BrandWise Leads Dashboard
+            </h1>
+            <p className="text-muted-foreground text-sm md:text-base">
+              Manage leads and recommendations generated from the BrandWise AI intelligence platform
+            </p>
+          </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <User className="h-4 w-4" />
             <span className="hidden md:inline">{user?.email}</span>
@@ -136,7 +144,10 @@ export default function LeadsManagement() {
         <Card className="mb-6">
           <CardHeader className="pb-4">
             <CardTitle className="flex flex-col md:flex-row md:items-center gap-4">
-              <span>AI Recommendation Leads ({filteredLeads.length})</span>
+              <span className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-primary" />
+                BrandWise Leads ({filteredLeads.length})
+              </span>
               <div className="relative flex-1 md:max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -302,12 +313,12 @@ export default function LeadsManagement() {
 
                                 {selectedLead.recommendations && (
                                   <Card>
-                                    <CardHeader className="pb-3">
-                                      <CardTitle className="text-lg flex items-center gap-2">
-                                        <Target className="h-5 w-5" />
-                                        AI-Generated Recommendations
-                                      </CardTitle>
-                                    </CardHeader>
+                                     <CardHeader className="pb-3">
+                                       <CardTitle className="text-lg flex items-center gap-2">
+                                         <Zap className="h-5 w-5 text-primary" />
+                                         BrandWise AI Recommendations
+                                       </CardTitle>
+                                     </CardHeader>
                                     <CardContent>
                                       <div 
                                         className="prose prose-sm max-w-none text-sm leading-relaxed"

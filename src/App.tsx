@@ -23,7 +23,7 @@ import ContactManagement from "./pages/admin/ContactManagement";
 import NewsletterManagement from "./pages/admin/NewsletterManagement";
 import LeadsManagement from "./pages/admin/LeadsManagement";
 import NotFound from "./pages/NotFound";
-import ServiceRecommendations from "./pages/ServiceRecommendations";
+import BrandWise from "./pages/BrandWise";
 
 const queryClient = new QueryClient();
 
@@ -42,7 +42,7 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/blog" element={<BlogPublic />} />
               <Route path="/blog/:id" element={<BlogPost />} />
-              <Route path="/service-recommendations" element={<ServiceRecommendations />} />
+              <Route path="/service-recommendations" element={<BrandWise />} />
               
               <Route path="/services" element={<Services />} />
               <Route path="/services/:slug" element={<ServicePage />} />

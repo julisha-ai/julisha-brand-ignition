@@ -14,7 +14,7 @@ import { services } from "@/lib/services";
 const navigation = [
   { name: "Home", href: "/" },
   { name: "About", href: "/about" },
-  { name: "AI Recommendations", href: "/service-recommendations" },
+  { name: "BrandWise", href: "/service-recommendations", isSpecial: true },
   { name: "Blog", href: "/blog" },
   { name: "Contact", href: "/contact" },
 ];
@@ -39,8 +39,13 @@ export default function Header() {
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-white hover:text-[#FFD700] transition-colors text-sm lg:text-base"
+                className={`transition-colors text-sm lg:text-base ${
+                  item.isSpecial 
+                    ? "text-[#FFD700] hover:text-[#FFE44D] font-medium flex items-center gap-1" 
+                    : "text-white hover:text-[#FFD700]"
+                }`}
               >
+                {item.isSpecial && <span>⚡</span>}
                 {item.name}
               </Link>
             ))}
@@ -123,9 +128,14 @@ export default function Header() {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="text-white hover:text-[#FFD700]"
+                  className={`transition-colors ${
+                    item.isSpecial 
+                      ? "text-[#FFD700] hover:text-[#FFE44D] font-medium flex items-center gap-1" 
+                      : "text-white hover:text-[#FFD700]"
+                  }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  {item.isSpecial && <span>⚡</span>}
                   {item.name}
                 </Link>
               ))}
