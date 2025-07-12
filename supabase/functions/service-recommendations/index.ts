@@ -108,48 +108,65 @@ Format the response as a professional business proposal with clear sections and 
 
     if (!perplexityApiKey) {
       console.error('PERPLEXITY_API_KEY not found in environment variables');
+      console.error('Available env vars:', Object.keys(Deno.env.toObject()));
     } else {
       try {
-        console.log('Making Perplexity API call...');
+        console.log('Making Perplexity API call with model: llama-3.1-sonar-small-128k-online');
+        
+        const requestBody = {
+          model: 'llama-3.1-sonar-small-128k-online',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert AI business consultant specializing in AI solutions and brand management. Provide detailed, actionable recommendations based on current market data and trends.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: 0.3,
+          top_p: 0.9,
+          max_tokens: 2000,
+          search_recency_filter: 'month',
+          frequency_penalty: 1,
+          presence_penalty: 0
+        };
+        
+        console.log('Request body:', JSON.stringify(requestBody, null, 2));
+        
         const response = await fetch('https://api.perplexity.ai/chat/completions', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${perplexityApiKey}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            model: 'llama-3.1-sonar-small-128k-online',
-            messages: [
-              {
-                role: 'system',
-                content: 'You are an expert AI business consultant specializing in AI solutions and brand management. Provide detailed, actionable recommendations based on current market data and trends.'
-              },
-              {
-                role: 'user',
-                content: prompt
-              }
-            ],
-            temperature: 0.3,
-            top_p: 0.9,
-            max_tokens: 2000,
-            search_recency_filter: 'month',
-            frequency_penalty: 1,
-            presence_penalty: 0
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         console.log('Perplexity API response status:', response.status);
+        console.log('Perplexity API response headers:', Object.fromEntries(response.headers.entries()));
 
         if (response.ok) {
           const data = await response.json();
           console.log('Perplexity API response received successfully');
-          recommendations = data.choices[0].message.content;
+          console.log('Response data structure:', JSON.stringify(data, null, 2));
+          
+          if (data.choices && data.choices[0] && data.choices[0].message) {
+            recommendations = data.choices[0].message.content;
+            console.log('Recommendations extracted successfully');
+          } else {
+            console.error('Unexpected response structure:', data);
+            throw new Error('Unexpected response structure from Perplexity API');
+          }
         } else {
           const errorText = await response.text();
           console.error('Perplexity API error response:', response.status, errorText);
+          throw new Error(`Perplexity API error: ${response.status} - ${errorText}`);
         }
       } catch (perplexityError) {
         console.error('Perplexity API error:', perplexityError);
+        throw perplexityError;
       }
     }
 
