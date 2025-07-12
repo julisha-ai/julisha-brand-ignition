@@ -97,8 +97,13 @@ Format the response as a professional business proposal with clear sections and 
 
     let recommendations = 'AI-powered recommendations temporarily unavailable. Our team will provide personalized recommendations via email within 24 hours.';
 
-    if (perplexityApiKey) {
+    console.log('PERPLEXITY_API_KEY available:', !!perplexityApiKey);
+
+    if (!perplexityApiKey) {
+      console.error('PERPLEXITY_API_KEY not found in environment variables');
+    } else {
       try {
+        console.log('Making Perplexity API call...');
         const response = await fetch('https://api.perplexity.ai/chat/completions', {
           method: 'POST',
           headers: {
@@ -126,9 +131,15 @@ Format the response as a professional business proposal with clear sections and 
           }),
         });
 
+        console.log('Perplexity API response status:', response.status);
+
         if (response.ok) {
           const data = await response.json();
+          console.log('Perplexity API response received successfully');
           recommendations = data.choices[0].message.content;
+        } else {
+          const errorText = await response.text();
+          console.error('Perplexity API error response:', response.status, errorText);
         }
       } catch (perplexityError) {
         console.error('Perplexity API error:', perplexityError);
