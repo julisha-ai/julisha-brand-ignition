@@ -11,6 +11,12 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
 
+console.log('Environment check:');
+console.log('SUPABASE_URL:', !!supabaseUrl);
+console.log('SUPABASE_SERVICE_ROLE_KEY:', !!supabaseServiceKey);
+console.log('PERPLEXITY_API_KEY:', !!perplexityApiKey);
+console.log('All environment variables:', Object.keys(Deno.env.toObject()));
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
