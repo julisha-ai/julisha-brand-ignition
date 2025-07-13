@@ -1,4 +1,5 @@
 
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
@@ -111,10 +112,10 @@ Format the response as a professional business proposal with clear sections and 
       console.error('Available env vars:', Object.keys(Deno.env.toObject()));
     } else {
       try {
-        console.log('Making Perplexity API call with model: llama-3.1-sonar-small-128k-online');
+        console.log('Making Perplexity API call with model: sonar-reasoning-pro');
         
         const requestBody = {
-          model: 'llama-3.1-sonar-small-128k-online',
+          model: 'sonar-reasoning-pro',
           messages: [
             {
               role: 'system',
@@ -194,3 +195,4 @@ Format the response as a professional business proposal with clear sections and 
     });
   }
 });
+
