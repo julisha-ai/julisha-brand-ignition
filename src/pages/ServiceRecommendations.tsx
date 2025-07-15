@@ -18,10 +18,12 @@ const BrandWise = () => {
     phone: "",
     company: "",
     industry: "",
+    customIndustry: "",
     businessSize: "",
     currentChallenges: "",
     goals: "",
     budgetRange: "",
+    specificBudget: "",
     timeline: "",
     additionalInfo: ""
   });
@@ -229,7 +231,7 @@ const BrandWise = () => {
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="industry">Industry</Label>
                     <Select onValueChange={(value) => handleInputChange('industry', value)}>
                       <SelectTrigger>
@@ -247,6 +249,13 @@ const BrandWise = () => {
                         <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
+                    {formData.industry === 'other' && (
+                      <Input
+                        placeholder="Please specify your industry"
+                        value={formData.customIndustry}
+                        onChange={(e) => handleInputChange('customIndustry', e.target.value)}
+                      />
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="businessSize">Business Size</Label>
@@ -287,7 +296,7 @@ const BrandWise = () => {
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="budgetRange">Budget Range</Label>
                     <Select onValueChange={(value) => handleInputChange('budgetRange', value)}>
                       <SelectTrigger>
@@ -301,6 +310,13 @@ const BrandWise = () => {
                         <SelectItem value="over-100k">Over $100,000</SelectItem>
                       </SelectContent>
                     </Select>
+                    {formData.budgetRange === 'under-10k' && (
+                      <Input
+                        placeholder="Specify exact budget (e.g., $5,000)"
+                        value={formData.specificBudget}
+                        onChange={(e) => handleInputChange('specificBudget', e.target.value)}
+                      />
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="timeline">Implementation Timeline</Label>
