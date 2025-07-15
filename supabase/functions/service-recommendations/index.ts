@@ -65,43 +65,75 @@ serve(async (req) => {
       throw new Error(`Failed to save lead: ${leadError.message}`);
     }
 
-    // Generate recommendations using Perplexity API
-    const prompt = `As an AI business consultant for Julisha Solutions (an AI innovation and brand management company), analyze this business profile and provide comprehensive service recommendations:
+    // Generate recommendations using engineered prompt
+    const engineeredPrompt = `ROLE
+You are a senior AI business consultant for Julisha Solutions, an established AI innovation and brand management company. You provide clear, actionable business recommendations based on data-driven insights.
 
-Company: ${company || 'Not specified'}
-Industry: ${industry || 'Not specified'}
-Business Size: ${businessSize || 'Not specified'}
-Current Challenges: ${currentChallenges || 'Not specified'}
-Goals: ${goals || 'Not specified'}
-Budget Range: ${budgetRange || 'Not specified'}
-Timeline: ${timeline || 'Not specified'}
-Additional Info: ${additionalInfo || 'Not specified'}
+OBJECTIVE
+Create a concise, professional business proposal with specific service recommendations for the client's business challenges.
 
-Based on current market trends and AI innovations in 2024-2025, provide:
+CONTEXT PACKAGE
+Client Details:
+- Company: ${company || 'Not specified'}
+- Industry: ${industry || 'Not specified'}
+- Business Size: ${businessSize || 'Not specified'}
+- Current Challenges: ${currentChallenges || 'Not specified'}
+- Goals: ${goals || 'Not specified'}
+- Budget Range: ${budgetRange || 'Not specified'}
+- Timeline: ${timeline || 'Not specified'}
+- Additional Context: ${additionalInfo || 'Not specified'}
 
-1. **Primary Service Recommendations** from Julisha Solutions:
-   - Smart Agents (AI-powered business automation)
-   - Conversational AI (chatbots, virtual assistants)
-   - Brand Management (digital presence optimization)
-   - AI Consulting (implementation guidance)
-   - Web Development (custom solutions)
+Available Julisha Solutions Services:
+1. Smart Agents (AI automation for business processes)
+2. Conversational AI (chatbots, virtual assistants)
+3. Brand Management (digital presence optimization)
+4. AI Consulting (implementation guidance)
+5. Web Development (custom solutions)
 
-2. **Strategic Implementation Plan**:
-   - Phase-by-phase rollout
-   - Timeline considerations
-   - Resource requirements
+Voice and Tone: Professional, consultative, action-oriented
+Length Target: Maximum 800 words total
+Key Constraints: 
+- Stay within specified word limit
+- Provide specific, actionable recommendations only
+- Include realistic budget estimates
+- Focus on measurable outcomes
+- Avoid repetition or filler content
 
-3. **Budget Optimization**:
-   - Cost-effective approaches
-   - ROI projections
-   - Scalability options
+WORKFLOW RULES
+1. Analyze the client's specific situation
+2. Recommend 2-3 most relevant services (not all services)
+3. Provide implementation timeline with specific phases
+4. Give realistic budget breakdown within their range
+5. Include 1-2 key market trends relevant to their industry
+6. End with clear next steps
 
-4. **Market Trends & Future-Proofing**:
-   - Current AI trends relevant to their industry
-   - Emerging technologies to consider
-   - Competitive advantages
+OUTPUT FORMAT
+Structure your response with these exact headings:
 
-Format the response as a professional business proposal with clear sections and actionable insights.`;
+## Primary Service Recommendations
+[List 2-3 most relevant services with brief justification]
+
+## Implementation Roadmap
+[3-month phased approach with specific milestones]
+
+## Investment Breakdown
+[Realistic cost allocation within their budget]
+
+## Market Advantage
+[1-2 current trends that support these recommendations]
+
+## Next Steps
+[Specific actions the client should take]
+
+CRITICAL INSTRUCTIONS:
+- Maximum 800 words total
+- Be specific and actionable
+- No repetitive content
+- No technical jargon without explanation
+- End response immediately after "Next Steps" section
+- Do not add disclaimers or additional text beyond the format
+
+Begin analysis and recommendation:`;
 
     let recommendations = 'AI-powered recommendations temporarily unavailable. Our team will provide personalized recommendations via email within 24 hours.';
 
@@ -119,19 +151,19 @@ Format the response as a professional business proposal with clear sections and 
           messages: [
             {
               role: 'system',
-              content: 'You are an expert AI business consultant specializing in AI solutions and brand management. Provide detailed, actionable recommendations based on current market data and trends.'
+              content: 'You are a senior business consultant who provides precise, actionable recommendations. Always follow the exact format specified and stay within word limits. Never repeat content or add unnecessary text.'
             },
             {
               role: 'user',
-              content: prompt
+              content: engineeredPrompt
             }
           ],
-          temperature: 0.3,
-          top_p: 0.9,
-          max_tokens: 2000,
+          temperature: 0.2,
+          top_p: 0.8,
+          max_tokens: 1200,
           search_recency_filter: 'month',
-          frequency_penalty: 1,
-          presence_penalty: 0
+          frequency_penalty: 1.2,
+          presence_penalty: 0.5
         };
         
         console.log('Request body:', JSON.stringify(requestBody, null, 2));
