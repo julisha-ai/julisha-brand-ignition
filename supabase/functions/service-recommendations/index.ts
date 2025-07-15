@@ -31,10 +31,12 @@ serve(async (req) => {
       phone, 
       company, 
       industry, 
+      customIndustry,
       businessSize, 
       currentChallenges, 
       goals, 
       budgetRange, 
+      specificBudget,
       timeline, 
       additionalInfo 
     } = await req.json();
@@ -75,11 +77,11 @@ Create a concise, professional business proposal with specific service recommend
 CONTEXT PACKAGE
 Client Details:
 - Company: ${company || 'Not specified'}
-- Industry: ${industry || 'Not specified'}
+- Industry: ${industry === 'other' ? (customIndustry || 'Other') : (industry || 'Not specified')}
 - Business Size: ${businessSize || 'Not specified'}
 - Current Challenges: ${currentChallenges || 'Not specified'}
 - Goals: ${goals || 'Not specified'}
-- Budget Range: ${budgetRange || 'Not specified'}
+- Budget Range: ${budgetRange === 'under-10k' ? (specificBudget ? `${specificBudget} (under $10,000)` : 'Under $10,000') : (budgetRange || 'Not specified')}
 - Timeline: ${timeline || 'Not specified'}
 - Additional Context: ${additionalInfo || 'Not specified'}
 
