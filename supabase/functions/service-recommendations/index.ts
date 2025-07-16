@@ -1,5 +1,4 @@
 
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
@@ -163,9 +162,7 @@ Begin analysis and recommendation:`;
           temperature: 0.2,
           top_p: 0.8,
           max_tokens: 1200,
-          search_recency_filter: 'month',
-          frequency_penalty: 1.2,
-          presence_penalty: 0.5
+          search_recency_filter: 'month'
         };
         
         console.log('Request body:', JSON.stringify(requestBody, null, 2));
@@ -229,4 +226,3 @@ Begin analysis and recommendation:`;
     });
   }
 });
-
