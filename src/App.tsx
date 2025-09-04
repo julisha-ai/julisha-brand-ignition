@@ -22,6 +22,8 @@ import BlogManagement from "./pages/admin/BlogManagement";
 import ContactManagement from "./pages/admin/ContactManagement";
 import NewsletterManagement from "./pages/admin/NewsletterManagement";
 import LeadsManagement from "./pages/admin/LeadsManagement";
+import AIContentStudio from "./pages/admin/AIContentStudio";
+import PasswordReset from "./pages/PasswordReset";
 import NotFound from "./pages/NotFound";
 import BrandWise from "./pages/ServiceRecommendations";
 
@@ -47,10 +49,12 @@ const App = () => (
               <Route path="/services" element={<Services />} />
               <Route path="/services/:slug" element={<ServicePage />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/password-reset" element={<PasswordReset />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/blog" element={<BlogManagement />} />
               <Route path="/admin/blog/new" element={<BlogEditor />} />
               <Route path="/admin/blog/edit/:id" element={<BlogEditor />} />
+              <Route path="/admin/blog/ai-studio" element={<AIContentStudio />} />
               <Route path="/admin/contacts" element={<ContactManagement />} />
               <Route path="/admin/newsletter" element={<NewsletterManagement />} />
               <Route path="/admin/leads" element={<LeadsManagement />} />

@@ -67,6 +67,24 @@ export default function Login() {
 
     setMagicLinkLoading(true);
     try {
+      // First verify email exists in the database
+      const { data: emailCheck, error: verifyError } = await supabase.functions.invoke('verify-email', {
+        body: { email }
+      });
+
+      if (verifyError) {
+        throw verifyError;
+      }
+
+      if (!emailCheck.exists) {
+        toast({
+          title: "Email Not Found",
+          description: "This email address is not registered. Please contact your administrator.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -109,8 +127,26 @@ export default function Login() {
 
     setResetLoading(true);
     try {
+      // First verify email exists in the database
+      const { data: emailCheck, error: verifyError } = await supabase.functions.invoke('verify-email', {
+        body: { email }
+      });
+
+      if (verifyError) {
+        throw verifyError;
+      }
+
+      if (!emailCheck.exists) {
+        toast({
+          title: "Email Not Found",
+          description: "This email address is not registered. Please contact your administrator.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/admin`,
+        redirectTo: `${window.location.origin}/password-reset`,
       });
 
       if (error) {

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Edit, Trash2, Eye } from "lucide-react";
+import { ArrowLeft, Plus, Edit, Trash2, Eye, Sparkles } from "lucide-react";
 
 interface BlogPost {
   id: string;
@@ -115,10 +115,16 @@ export default function BlogManagement() {
             Back to Dashboard
           </Button>
           <h1 className="text-3xl font-bold">Blog Management</h1>
-          <Button onClick={() => navigate("/admin/blog/new")} className="ml-auto">
-            <Plus className="h-4 w-4 mr-2" />
-            New Post
-          </Button>
+          <div className="flex gap-2 ml-auto">
+            <Button onClick={() => navigate("/admin/blog/ai-studio")} variant="outline">
+              <Sparkles className="h-4 w-4 mr-2" />
+              AI Content Studio
+            </Button>
+            <Button onClick={() => navigate("/admin/blog/new")}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Post
+            </Button>
+          </div>
         </div>
 
         {posts.length === 0 ? (
