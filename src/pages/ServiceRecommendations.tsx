@@ -387,7 +387,7 @@ const BrandWise = () => {
                       </Button>
                       <Button size="sm" onClick={handleSaveRecommendations} className="bg-gradient-to-r from-primary to-primary/80">
                         <Save className="h-4 w-4 mr-1" />
-                        Save & Unlock Pro
+                        Save & Book a Live Call
                       </Button>
                     </div>
                   )}
@@ -407,10 +407,10 @@ const BrandWise = () => {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-2xl">
                   <Zap className="h-6 w-6 text-primary" />
-                  Unlock BrandWise Pro
+                  Save & Book a Live Call
                 </DialogTitle>
                 <DialogDescription>
-                  Save your recommendations and access specialized AI business companions for ongoing consultation.
+                  Enhance your experience! Take the next step and schedule a 1:1 session with our experts.
                 </DialogDescription>
               </DialogHeader>
               
@@ -419,27 +419,35 @@ const BrandWise = () => {
                 <div className="bg-gradient-to-br from-primary/10 to-secondary/10 p-6 rounded-lg">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-primary" />
-                    What You Get with BrandWise Pro:
+                    What You Get When You Book:
                   </h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     <ul className="space-y-2">
                       <li className="flex items-center gap-2">
                         <Star className="h-4 w-4 text-primary" />
-                        Save and access all your recommendations anytime
+                        1:1 expert consultation session
                       </li>
                       <li className="flex items-center gap-2">
                         <Star className="h-4 w-4 text-primary" />
-                        Access to specialized AI business companions
+                        First month free BrandWisePro subscription
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Star className="h-4 w-4 text-primary" />
+                        Save and access all your recommendations anytime
                       </li>
                     </ul>
                     <ul className="space-y-2">
                       <li className="flex items-center gap-2">
                         <Star className="h-4 w-4 text-primary" />
-                        Follow-up consultations at subsidized rates
+                        Priority support and expert guidance
                       </li>
                       <li className="flex items-center gap-2">
                         <Star className="h-4 w-4 text-primary" />
-                        Priority support and expert guidance
+                        Follow-up consultations included
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Star className="h-4 w-4 text-primary" />
+                        Access to exclusive business tools
                       </li>
                     </ul>
                   </div>
@@ -483,10 +491,10 @@ const BrandWise = () => {
                 {/* Pricing */}
                 <div className="text-center space-y-4">
                   <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-6 rounded-lg">
-                    <div className="text-4xl font-bold text-primary mb-2">$29</div>
-                    <div className="text-sm text-muted-foreground mb-1">One-time registration fee</div>
+                    <div className="text-4xl font-bold text-primary mb-2">$100</div>
+                    <div className="text-sm text-muted-foreground mb-1">Live consultation session</div>
                     <div className="text-xs text-muted-foreground">
-                      Unlock Pro features + access to specialized companions at subsidized rates
+                      Includes first month free BrandWisePro subscription
                     </div>
                   </div>
                   
@@ -496,15 +504,15 @@ const BrandWise = () => {
                     onClick={() => window.open('https://payment.intasend.com/pay/46132722-b089-4fdc-a73d-762ebfcb34ab/', '_blank')}
                   >
                     <Zap className="mr-2 h-4 w-4" />
-                    Get BrandWise Pro Access Now
+                    Book Your Live Call Now
                   </Button>
                   
                   <div className="space-y-2">
                     <p className="text-xs text-muted-foreground">
-                      Secure payment powered by IntaSend. Create your account after payment to access Pro features.
+                      Secure payment powered by IntaSend. Your booking automatically qualifies you for first month free BrandWisePro subscription.
                     </p>
                     <p className="text-xs text-primary font-medium">
-                      ⚡ Limited Time: Get 50% off your first specialized consultation session
+                      ⚡ Bonus: Get personalized guidance + priority support + exclusive business tools
                     </p>
                   </div>
                 </div>
