@@ -1,5 +1,5 @@
-
 import { Card } from "@/components/ui/card";
+import DOMPurify from "dompurify";
 
 interface BlogContentRendererProps {
   content: string;
@@ -41,7 +41,7 @@ export function BlogContentRenderer({ content, showAds = true }: BlogContentRend
     // Convert line breaks to paragraphs
     const paragraphs = processed.split('\n\n').filter(p => p.trim());
     
-    return paragraphs.map((paragraph, index) => {
+    const htmlContent = paragraphs.map((paragraph) => {
       // Skip if it's already formatted (contains HTML tags)
       if (paragraph.includes('<')) {
         return paragraph;
@@ -50,6 +50,12 @@ export function BlogContentRenderer({ content, showAds = true }: BlogContentRend
       // Regular paragraph
       return `<p class="mb-4 leading-relaxed text-foreground">${paragraph.replace(/\n/g, '<br />')}</p>`;
     }).join('');
+
+    // Sanitize HTML to prevent XSS attacks
+    return DOMPurify.sanitize(htmlContent, {
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'a', 'img', 'blockquote', 'code', 'u'],
+      ALLOWED_ATTR: ['href', 'class', 'target', 'rel', 'src', 'alt', 'loading']
+    });
   };
 
   const splitContentForAds = (content: string) => {
@@ -110,4 +116,4 @@ export function BlogContentRenderer({ content, showAds = true }: BlogContentRend
       <AdPlaceholder position="End-of-Article" />
     </div>
   );
-};
+}

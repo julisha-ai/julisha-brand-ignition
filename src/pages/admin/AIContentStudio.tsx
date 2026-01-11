@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import DOMPurify from "dompurify";
 
 interface AIContentResponse {
   content: string;
@@ -415,13 +416,16 @@ export default function AIContentStudio() {
                 
                 <TabsContent value="preview" className="space-y-4">
                   <div className="prose max-w-none">
-                    <h1 className="text-3xl font-bold mb-4">{selectedTitle}</h1>
-                    <p className="text-lg text-muted-foreground mb-6">{finalExcerpt}</p>
+                    <h1 className="text-3xl font-bold mb-4">{DOMPurify.sanitize(selectedTitle, { ALLOWED_TAGS: [] })}</h1>
+                    <p className="text-lg text-muted-foreground mb-6">{DOMPurify.sanitize(finalExcerpt, { ALLOWED_TAGS: [] })}</p>
                     <Separator className="mb-6" />
                     <div 
                       className="markdown-content"
                       dangerouslySetInnerHTML={{ 
-                        __html: finalContent.replace(/\n/g, '<br>') 
+                        __html: DOMPurify.sanitize(finalContent.replace(/\n/g, '<br>'), {
+                          ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'a', 'blockquote', 'code'],
+                          ALLOWED_ATTR: ['href', 'class', 'target', 'rel']
+                        })
                       }}
                     />
                   </div>
