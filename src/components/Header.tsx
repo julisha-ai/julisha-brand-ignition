@@ -10,6 +10,7 @@ import {
   NavigationMenuTrigger
 } from "./ui/navigation-menu";
 import { services } from "@/lib/services";
+import { Shield } from "lucide-react";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -18,6 +19,8 @@ const navigation = [
   { name: "Blog", href: "/blog" },
   { name: "Contact", href: "/contact" },
 ];
+
+const GOVERNANCE_URL = "https://governance.julishasolutions.com";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,6 +52,16 @@ export default function Header() {
                 {item.name}
               </Link>
             ))}
+
+            <a
+              href={GOVERNANCE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#FFD700] hover:text-[#FFE44D] font-medium flex items-center gap-1.5 text-sm lg:text-base transition-colors"
+            >
+              <Shield className="w-4 h-4" />
+              Governance
+            </a>
 
             <NavigationMenu className="relative z-50">
               <NavigationMenuList>
@@ -139,6 +152,17 @@ export default function Header() {
                   {item.name}
                 </Link>
               ))}
+              
+              <a
+                href={GOVERNANCE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#FFD700] hover:text-[#FFE44D] font-medium flex items-center gap-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Shield className="w-4 h-4" />
+                Governance Ladder
+              </a>
               
               <div className="py-2">
                 <div className="font-medium mb-2">Our Services</div>

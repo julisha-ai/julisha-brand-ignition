@@ -2,6 +2,7 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import { ChatWidget } from "./ChatWidget";
+import CookieConsent from "./CookieConsent";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </main>
       <Footer />
       <ChatWidget />
+      <CookieConsent />
     </div>
   );
 }

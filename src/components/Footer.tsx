@@ -1,8 +1,10 @@
 
-import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Twitter, Youtube, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { services } from "@/lib/services";
 import NewsletterSignup from "./NewsletterSignup";
+
+const GOVERNANCE_URL = "https://governance.julishasolutions.com";
 
 const footerLinks = [
   {
@@ -71,6 +73,17 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+              <li className="pt-2 border-t border-gray-800 mt-2">
+                <a
+                  href={GOVERNANCE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#FFD700] hover:text-[#FFE44D] transition-colors text-sm flex items-center gap-2"
+                >
+                  <Shield className="w-4 h-4" />
+                  Governance Ladder
+                </a>
+              </li>
             </ul>
           </div>
 
