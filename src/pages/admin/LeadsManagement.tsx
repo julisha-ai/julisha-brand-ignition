@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/hooks/use-toast";
 import { User, Search, Eye, Calendar, Building, Mail, Phone, Target, DollarSign, Clock, Zap } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import DOMPurify from "dompurify";
 
 interface Lead {
   id: string;
@@ -32,7 +33,7 @@ interface Lead {
 const formatRecommendations = (text: string) => {
   if (!text) return "";
   
-  return text
+  const formatted = text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/###\s*(.*)/g, '<h3 class="text-lg font-semibold mt-4 mb-2 text-primary">$1</h3>')
@@ -41,6 +42,12 @@ const formatRecommendations = (text: string) => {
     .replace(/\n\n/g, '</p><p class="mb-3">')
     .replace(/\n/g, '<br/>')
     .replace(/^(.*)/, '<p class="mb-3">$1</p>');
+
+  // Sanitize HTML to prevent XSS attacks
+  return DOMPurify.sanitize(formatted, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'a', 'blockquote', 'code'],
+    ALLOWED_ATTR: ['href', 'class', 'target', 'rel']
+  });
 };
 
 export default function LeadsManagement() {

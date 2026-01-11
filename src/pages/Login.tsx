@@ -67,24 +67,7 @@ export default function Login() {
 
     setMagicLinkLoading(true);
     try {
-      // First verify email exists in the database
-      const { data: emailCheck, error: verifyError } = await supabase.functions.invoke('verify-email', {
-        body: { email }
-      });
-
-      if (verifyError) {
-        throw verifyError;
-      }
-
-      if (!emailCheck.exists) {
-        toast({
-          title: "Email Not Found",
-          description: "This email address is not registered. Please contact your administrator.",
-          variant: "destructive",
-        });
-        return;
-      }
-
+      // Send magic link without verifying if email exists (prevents user enumeration)
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -95,13 +78,14 @@ export default function Login() {
       if (error) {
         toast({
           title: "Error",
-          description: error.message,
+          description: "Failed to send login link. Please try again.",
           variant: "destructive",
         });
       } else {
+        // Always show the same message to prevent user enumeration
         toast({
-          title: "Magic Link Sent!",
-          description: "Check your email for a login link",
+          title: "Check Your Email",
+          description: "If an account exists with this email, we've sent a login link.",
         });
       }
     } catch (error) {
@@ -127,24 +111,7 @@ export default function Login() {
 
     setResetLoading(true);
     try {
-      // First verify email exists in the database
-      const { data: emailCheck, error: verifyError } = await supabase.functions.invoke('verify-email', {
-        body: { email }
-      });
-
-      if (verifyError) {
-        throw verifyError;
-      }
-
-      if (!emailCheck.exists) {
-        toast({
-          title: "Email Not Found",
-          description: "This email address is not registered. Please contact your administrator.",
-          variant: "destructive",
-        });
-        return;
-      }
-
+      // Send reset email without verifying if email exists (prevents user enumeration)
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/password-reset`,
       });
@@ -152,13 +119,14 @@ export default function Login() {
       if (error) {
         toast({
           title: "Error",
-          description: error.message,
+          description: "Failed to send reset email. Please try again.",
           variant: "destructive",
         });
       } else {
+        // Always show the same message to prevent user enumeration
         toast({
-          title: "Password Reset Sent!",
-          description: "Check your email for reset instructions",
+          title: "Check Your Email",
+          description: "If an account exists with this email, we've sent reset instructions.",
         });
       }
     } catch (error) {
