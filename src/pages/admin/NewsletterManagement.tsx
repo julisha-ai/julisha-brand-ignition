@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,7 @@ const NewsletterManagement = () => {
   const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   const fetchSubscribers = async () => {
@@ -46,8 +48,17 @@ const NewsletterManagement = () => {
   };
 
   useEffect(() => {
-    fetchSubscribers();
-  }, []);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/login");
+        return;
+      }
+      fetchSubscribers();
+    };
+
+    checkAuth();
+  }, [navigate]);
 
   const handleUnsubscribe = async (id: string) => {
     if (!confirm('Are you sure you want to unsubscribe this email?')) return;
