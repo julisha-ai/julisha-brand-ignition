@@ -31,8 +31,8 @@ export default function CookieConsent() {
           <div className="flex items-start gap-3 flex-1">
             <Shield className="w-5 h-5 text-[#FFD700] flex-shrink-0 mt-0.5" />
             <p className="text-sm text-gray-300">
-              This governance instrument utilizes engagement telemetry to enhance your executive experience. 
-              By continuing to navigate or interact with this platform, you acknowledge and accept Julisha Solutions'{' '}
+              This platform employs analytics to deliver an optimized executive experience. 
+              Continued engagement signifies acceptance of our{' '}
               <Link to="/terms" className="text-[#FFD700] hover:text-[#FFE44D] underline">
                 Terms of Service
               </Link>{' '}
