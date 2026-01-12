@@ -28,6 +28,8 @@ import NotFound from "./pages/NotFound";
 import BrandWise from "./pages/ServiceRecommendations";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import AIEthics from "./pages/AIEthics";
+import DPA from "./pages/DPA";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +64,8 @@ const App = () => (
               <Route path="/admin/leads" element={<LeadsManagement />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/ai-ethics" element={<AIEthics />} />
+              <Route path="/dpa" element={<DPA />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>
